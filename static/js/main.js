@@ -10,14 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('user-logged-in');
         }
     }
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            localStorage.setItem('isLoggedIn', 'true');
-            const nextUrl = new URLSearchParams(window.location.search).get('next');
-            window.location.href = nextUrl || 'home.html';
-        });
-    }
+    // if (loginForm) {
+    //     loginForm.addEventListener('submit', function(e) {
+    //         e.preventDefault();
+    //         localStorage.setItem('isLoggedIn', 'true');
+    //         // const nextUrl = new URLSearchParams(window.location.search).get('next');
+    //         window.location.href = "/";
+    //     });
+    // }
     if (logoutButton) {
         logoutButton.addEventListener('click', function(e) {
             e.preventDefault();

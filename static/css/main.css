@@ -113,7 +113,7 @@ header {
 
 .header__auth-buttons {
     width: 192px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 12px;
 }

@@ -783,7 +783,7 @@ footer {
 ========================================
 */
 .header__user-actions {
-    display: none;
+    display: flex !important;
     align-items: center;
     gap: 24px;
 }

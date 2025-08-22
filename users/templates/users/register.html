@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+
+    <main class="auth-page-wrapper">
+        <div class="auth-background">
+            <img src="{% static 'img/background/pattern.jpg' %}"
+                 alt="Background pattern">
+        </div>
+        <div class="auth-form-container">
+            <div class="auth-container auth-container--register">
+                <div class="Legend">
+                    <h1 class="auth-title">Register</h1>
+                </div>
+                {% if messages %}
+                    <div class="messages-container">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                <strong>{{ message.tags|upper }}:</strong> {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="display: none;">No messages found</div>
+                {% endif %}
+
+                <form class="auth-form" id="register-form" method="post">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div class="InputField">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}
+                                <div class="error-message">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="ButtonGroup">
+                        <button type="submit" class="button button--primary">
+                            Register
+                        </button>
+                    </div>
+                </form>
+
+                <p class="auth-switch">Already have an account? <a
+                        href="{% url 'users:login' %}">Sign in</a></p>
+            </div>
+        </div>
+    </main>
+{% endblock %}

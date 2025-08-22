@@ -2,47 +2,60 @@
 {% load static %}
 
 {% block content %}
-<!-- Main Content -->
-<main class="auth-page-wrapper">
-  <div class="auth-background">
-    <img src="{% static 'img/background/pattern.jpg' %}" alt="Background pattern">
-  </div>
-  <div class="auth-form-container">
-    <div class="auth-container auth-container--login">
-      <div class="Legend">
-        <h1 class="auth-title">Sign In</h1>
-      </div>
-
-      <form class="auth-form" method="post" action="{% url 'users:login' %}">
-        {% csrf_token %}
-
-        {% if form.errors %}
-        <div class="alert alert-danger">
-          <p>Please enter a correct email and password.</p>
+    <!-- Main Content -->
+    <main class="auth-page-wrapper">
+        <div class="auth-background">
+            <img src="{% static 'img/background/pattern.jpg' %}"
+                 alt="Background pattern">
         </div>
-        {% endif %}
+        <div class="auth-form-container">
+            <div class="auth-container auth-container--login">
+                <div class="Legend">
+                    <h1 class="auth-title">Sign In</h1>
+                </div>
 
-        <div class="InputField">
-          <label for="id_username">Email</label>
-          {{ form.username }}
+                <form class="auth-form" method="post"
+                      action="{% url 'users:login' %}">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <p>Please enter a correct email and password.</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="InputField">
+                        <label for="id_username">Email</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="InputField">
+                        <label for="id_password">Password</label>
+                        {{ form.password }}
+                    </div>
+                    <div class="CheckboxField">
+                        <label class="checkbox-container">Remember me
+                            <input type="checkbox" name="remember_me" value="on" checked>
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+
+                    <div class="ButtonGroup">
+                        <button type="submit" class="button button--primary">
+                            Sign In
+                        </button>
+                    </div>
+
+                    <div class="TextLink">
+                        <a href="#">Forgot password?</a>
+                    </div>
+
+                </form>
+
+                <p class="auth-switch">Don't have an account? <a
+                        href="{% url 'users:register' %}">Sign up</a></p>
+            </div>
         </div>
+    </main>
 
-        <div class="InputField">
-          <label for="id_password">Password</label>
-          {{ form.password }}
-        </div>
-
-        <div class="ButtonGroup">
-          <button type="submit" class="button button--primary">Sign In</button>
-        </div>
-
-        <div class="TextLink">
-          <a href="#">Forgot password?</a>
-        </div>
-      </form>
-
-      <p class="auth-switch">Don't have an account? <a href="#">Sign up</a></p>
-    </div>
-  </div>
-</main>
 {% endblock %}

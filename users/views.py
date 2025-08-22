@@ -15,18 +15,11 @@ class UserLoginView(LoginView):
 
     def form_valid(self, form):
         remember_me = self.request.POST.get('remember_me') == 'on'
-        print(f"Remember me: {remember_me}")
-        print(
-            f"Session expiry: {self.request.session.get_expiry_age()} seconds")
-        print(f"POST data: {dict(self.request.POST)}")
-
         if not remember_me:
             self.request.session.set_expiry(0)
-
         else:
             self.request.session.set_expiry(None)
-
-        return super(UserLoginView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 

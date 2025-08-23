@@ -93,8 +93,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-LOGIN_REDIRECT_URL = '/home'
-LOGOUT_REDIRECT_URL = '/home'
+LOGIN_REDIRECT_URL = '/products'
+LOGOUT_REDIRECT_URL = '/products'
 
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False

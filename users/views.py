@@ -13,26 +13,34 @@ class UserLoginView(LoginView):
     template_name = 'users/login.html'
     form_class = EmailLoginForm
 
+    def get_initial(self):
+        initial = super(UserLoginView, self).get_initial()
+        email = self.request.session.get('email')
+        if email:
+            initial['username'] = email
+        return initial
+
     def form_valid(self, form):
         remember_me = self.request.POST.get('remember_me') == 'on'
         if not remember_me:
             self.request.session.set_expiry(0)
         else:
             self.request.session.set_expiry(None)
-        return super(UserLoginView, self).form_valid(form)
-
+        return super().form_valid(form)
 
 
 class RegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'users/register.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.save()
+        user = form.save()
 
-        login(self.request, self.object)
-        messages.success(self.request, 'Registration successful! 🎉')
+        self.request.session['register_email'] = user.email
+        messages.add_message(
+            self.request, messages.SUCCESS,
+            'Registration successful! Please log in.')
+        return super(RegisterView, self).form_valid(form)
 
-        return super().form_valid(form)
+

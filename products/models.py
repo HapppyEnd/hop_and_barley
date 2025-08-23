@@ -2,9 +2,10 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.text import slugify
+from products.mixins import SlugMixin
 
 
-class JournalizedModel(models.Model):
+class JournalizedModel(models.Model, SlugMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -15,31 +16,28 @@ class JournalizedModel(models.Model):
 
 class Category(JournalizedModel):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,
-                               blank=True)
+                               blank=True, related_name='subcategories')
 
     class Meta:
-        verbose_name = 'category'
-        verbose_name_plural = 'categories'
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
+        self.generate_unique_slug(Category)
         super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return f'products/category/{self.slug}/'
 
 
 class Product(JournalizedModel):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,
+                                 related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='product_images', blank=True,
                               null=True)
@@ -54,21 +52,26 @@ class Product(JournalizedModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
+        self.generate_unique_slug(Product)
         super().save(*args, **kwargs)
 
 
 class Review(JournalizedModel):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name='reviews')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             related_name='reviews')
     rating = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)])
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text='Enter a rating between 1-5')
+    title = models.CharField(max_length=100, blank=True, null=True)
     comment = models.TextField()
 
     class Meta:
         verbose_name = 'Review'
         verbose_name_plural = 'Reviews'
+        ordering = ('-created_at',)
+        unique_together = ('user', 'product')
 
     def __str__(self):
         return f'{self.user.username}: {self.rating} - {self.comment}'

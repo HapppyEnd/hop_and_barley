@@ -12,6 +12,7 @@
                          {% if product.image %}
                             {{ product.image.url }}
 
+
                         {% else %}{% static 'img/products/default_product.png' %}
                           {% endif %}"
                          alt="{{ product.name }}" class="product-image">
@@ -83,30 +84,35 @@
                 <div class="reviews-grid">
                     {% for review in reviews %}
                         <div class="review-card">
-                            <div class="review-rating">
-                                {% for _ in review.rating|range %}
-                                    <i class="fa-solid fa-star"></i>
-                                {% endfor %}
-                                {% for _ in 5|range:review.rating %}
-                                    <i class="fa-regular fa-star"></i>
-                                {% endfor %}
-                            </div>
-                            <div class="review-body">
-                                <h4 class="review-heading">{{ review.comment }}</h4>
-                                <p class="review-text">{{ review.details }}</p>
+                        <div class="review-rating">
+                            {% for _ in review.rating|range %}
+                                <i class="fa-solid fa-star"></i>
+                            {% endfor %}
+                            {% for _ in 5|range:review.rating %}
+                                <i class="fa-regular fa-star"></i>
+                            {% endfor %}
+                        </div>
+                        <div class="review-body">
+                            <h4 class="review-heading">{{ review.title }}</h4>
+                            <p class="review-text">{{ review.comment }}</p>
 
-                            </div>
-                            <div class="review-author">
+                        </div>
+                        <div class="review-author">
+                            {% if review.user.image %}
                                 <img src="{{ review.user.image.url }}"
                                      alt="User avatar" class="author-avatar">
-                                <span class="author-name">{{ review.user.username }}</span>
-                            </div>
+                            {% else %}
+                                <div class="author-avatar-default">
+                                    {{ review.user.username|first|upper }}
+                                </div>
+                            {% endif %}
+
                         </div>
 
                     {% empty %}
                         <p>No reviews yet.</p>
                     {% endfor %}
-                </div>
+                    </div>
             </section>
         </div>
     </main>

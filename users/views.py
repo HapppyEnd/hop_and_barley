@@ -19,7 +19,7 @@ class UserLoginView(LoginView):
             self.request.session.set_expiry(0)
         else:
             self.request.session.set_expiry(None)
-        return super().form_valid(form)
+        return super(UserLoginView, self).form_valid(form)
 
 
 

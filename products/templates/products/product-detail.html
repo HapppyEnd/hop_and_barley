@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% load static %}
+    {% load my_filters %}
+    <!-- Main Content -->
+    <main class="page-product">
+        <div class="container">
+            <!-- Product Info Section -->
+            <section class="product-details-section">
+                <div class="product-image-container">
+                    <img src="
+                         {% if product.image %}
+                            {{ product.image.url }}
+
+                        {% else %}{% static 'img/products/default_product.png' %}
+                          {% endif %}"
+                         alt="{{ product.name }}" class="product-image">
+                </div>
+                <div class="product-info-column">
+                    <div class="product-title-price">
+                        <h1 class="product-name">{{ product.name }}</h1>
+                        <div class="price-section">
+                            <span class="price-tag">per 1 lb</span>
+                            <p class="product-price">${{ product.price }}</p>
+                        </div>
+                    </div>
+                    <div class="product-description">
+                        <p>{{ product.description }}</p>
+                    </div>
+                    <div class="cart-controls">
+                        <button class="button button--primary add-to-cart-button"
+                                id="add-to-cart-btn">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span>Add to Cart</span>
+                        </button>
+                        <div class="quantity-counter is-hidden"
+                             id="quantity-counter">
+                            <button class="quantity-btn" data-action="decrease"
+                                    aria-label="Decrease quantity"><i
+                                    class="fa-solid fa-minus"></i></button>
+                            <span class="quantity-value">1 in cart</span>
+                            <button class="quantity-btn" data-action="increase"
+                                    aria-label="Increase quantity"><i
+                                    class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Technical Specifications Accordion -->
+            <section class="accordion-section">
+                <div class="accordion-item">
+                    <div class="accordion-title">
+                        <h3>Technical Specifications</h3>
+                        <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>Origin:</strong> USA / Belgium</li>
+                            <li><strong>Type:</strong> Crystal/Caramel Malt
+                            </li>
+                            <li><strong>Color (°L):</strong> 60 °L</li>
+                            <li><strong>Moisture:</strong> 5.0% max</li>
+                            <li><strong>Extract FG, Dry:</strong> 75%</li>
+                            <li><strong>Flavor Profile:</strong> Sweet,
+                                caramel, toffee, hints of toasted bread
+                            </li>
+                            <li><strong>Usage:</strong> Typically 3-15% of the
+                                grist
+                            </li>
+                            <li><strong>Recommended Beer Styles:</strong> Pale
+                                Ale, Amber Ale, IPA, Brown Ale, Porter, Stout,
+                                Scotch Ale
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Latest Reviews Section -->
+            <section class="reviews-section">
+                <h2 class="reviews-title">Latest reviews</h2>
+                <div class="reviews-grid">
+                    {% for review in reviews %}
+                        <div class="review-card">
+                            <div class="review-rating">
+                                {% for _ in review.rating|range %}
+                                    <i class="fa-solid fa-star"></i>
+                                {% endfor %}
+                                {% for _ in 5|range:review.rating %}
+                                    <i class="fa-regular fa-star"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="review-body">
+                                <h4 class="review-heading">{{ review.comment }}</h4>
+                                <p class="review-text">{{ review.details }}</p>
+
+                            </div>
+                            <div class="review-author">
+                                <img src="{{ review.user.image.url }}"
+                                     alt="User avatar" class="author-avatar">
+                                <span class="author-name">{{ review.user.username }}</span>
+                            </div>
+                        </div>
+
+                    {% empty %}
+                        <p>No reviews yet.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </main>
+
+{% endblock %}

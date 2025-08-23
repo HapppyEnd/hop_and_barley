@@ -33,3 +33,4 @@ class ProductDetailView(DetailView):
         context['reviews'] = Review.objects.filter(
             product=self.object).select_related('user')
         return context
+

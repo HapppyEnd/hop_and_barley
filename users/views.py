@@ -15,9 +15,10 @@ class UserLoginView(LoginView):
 
     def get_initial(self):
         initial = super(UserLoginView, self).get_initial()
-        email = self.request.session.get('email')
+        email = self.request.session.get('register_email')
         if email:
             initial['username'] = email
+            del self.request.session['register_email']
         return initial
 
     def form_valid(self, form):
@@ -38,9 +39,8 @@ class RegisterView(CreateView):
         user = form.save()
 
         self.request.session['register_email'] = user.email
+        self.request.session.modified = True
         messages.add_message(
             self.request, messages.SUCCESS,
             'Registration successful! Please log in.')
         return super(RegisterView, self).form_valid(form)
-
-

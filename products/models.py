@@ -5,7 +5,7 @@ from django.utils.text import slugify
 from products.mixins import SlugMixin
 
 
-class JournalizedModel(models.Model, SlugMixin):
+class JournalizedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -14,7 +14,7 @@ class JournalizedModel(models.Model, SlugMixin):
         ordering = ('-created_at',)
 
 
-class Category(JournalizedModel):
+class Category(JournalizedModel, SlugMixin):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,
@@ -23,6 +23,7 @@ class Category(JournalizedModel):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -32,7 +33,7 @@ class Category(JournalizedModel):
         super().save(*args, **kwargs)
 
 
-class Product(JournalizedModel):
+class Product(JournalizedModel, SlugMixin):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField()
@@ -47,6 +48,7 @@ class Product(JournalizedModel):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
+        ordering = ('-created_at',)
 
     def __str__(self):
         return self.name

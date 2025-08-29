@@ -1,6 +1,6 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django import forms
 from phonenumber_field.formfields import PhoneNumberField
 
 User = get_user_model()
@@ -31,14 +31,15 @@ class UserRegisterForm(UserCreationForm):
     password1 = forms.CharField(
         label='Password', widget=forms.PasswordInput(
             attrs={'class': 'input', 'placeholder': 'enter your password'}))
-    password2 = forms.CharField(label='Confirm password',
-                                widget=forms.PasswordInput(
-                                    attrs={'class': 'input',
-                                           'placeholder': 'repeat your password'}))
+    password2 = forms.CharField(
+        label='Confirm password',
+        widget=forms.PasswordInput(
+            attrs={'class': 'input',
+                   'placeholder': 'repeat your password'}))
 
     class Meta:
         model = User
-        fields = ('email', 'username','first_name', 'last_name', 'phone',)
+        fields = ('email', 'username', 'first_name', 'last_name', 'phone',)
 
     def clean_email(self):
         email = self.cleaned_data.get('email')

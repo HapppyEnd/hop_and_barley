@@ -11,9 +11,6 @@
                     <img src="
                          {% if product.image %}
                             {{ product.image.url }}
-
-
-                        {% else %}{% static 'img/products/default_product.png' %}
                           {% endif %}"
                          alt="{{ product.name }}" class="product-image">
                 </div>

@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'users.apps.UsersConfig',
     'products.apps.ProductsConfig',
+    'orders.apps.OrdersConfig',
+    'api.apps.ApiConfig',
 
 ]
 
@@ -77,6 +79,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ]
+}
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -98,5 +107,10 @@ LOGIN_REDIRECT_URL = '/products'
 LOGOUT_REDIRECT_URL = '/products'
 
 
+# Session settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_COOKIE_SECURE = False  # Set to True in production
+SESSION_COOKIE_HTTPONLY = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 1209600
+SESSION_SAVE_EVERY_REQUEST = False

@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from users.models import User
 
+
 @admin.register(User)
 class UserAdmin(UserAdmin):
     list_display = ('username', 'email', 'is_staff', 'is_superuser', 'image')

@@ -143,6 +143,23 @@ header {
     background-color: var(--slate-200);
 }
 
+.filter-button {
+    width: 100%;
+    height: 40px;
+    padding: 12px;
+    background-color: var(--green);
+    border: 1px solid var(--green);
+    color: var(--white-text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.filter-button:hover {
+    background-color: var(--dark-green);
+    border-color: var(--dark-green);
+}
+
 .button--primary {
     background-color: var(--green);
     border: 1px solid var(--green);
@@ -1979,4 +1996,93 @@ body.user-logged-in .header__user-actions {
 .static-page-content .button {
     height: 44px;
     padding: 0 32px;
+}
+
+/* Дополнительные стили для фильтров */
+.price-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-input {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.keyword-tag {
+    display: inline-flex;
+    align-items: center;
+    background: var(--background-green);
+    color: var(--green);
+    padding: 4px 8px;
+    border-radius: 12px;
+    margin: 2px;
+    font-size: 12px;
+    gap: 4px;
+}
+
+.remove-keyword-icon {
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.product-rating .fa-star {
+    color: #ccc;
+    font-size: 12px;
+}
+
+.product-rating .fa-star.filled {
+    color: #ffc107;
+}
+
+.product-rating span {
+    font-size: 12px;
+    color: var(--grey-text);
+    margin-left: 4px;
+}
+
+.no-products {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--grey-text);
+    font-size: 18px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .main-content-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .search-sort-bar {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .search-input-wrapper {
+        max-width: 100%;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+    }
+
+    .sort-options {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }

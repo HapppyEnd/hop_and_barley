@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-
 {% load static %}
+{% load my_filters %}
 
 {% block content %}
     <!-- Main Content -->
@@ -12,96 +12,144 @@
             <div class="hero-banner__overlay"></div>
         </section>
 
-        <div class="container main-content-grid">
-            <aside class="sidebar filter-menu">
-                <div class="sidebar__section">
-                    <h3 class="section-title">Keywords</h3>
-                    <div class="keywords-list">
-                    </div>
-                </div>
 
-                <div class="sidebar__section">
-                    <h3 class="section-title">Product Type</h3>
-                    <div class="checkbox-group">
-                        {% for category in categories %}
-                        <label class="checkbox-container">
-                            {{ category.name }}
-                            <input type="checkbox"
-                                   name="category"
-                                   value="{{ category.id }}"
-                                   data-keyword="{{ category.name }}">
-                            <span class="checkmark"></span>
-                        </label>
+        <form id="main-filter-form" method="get" action=".">
+            <div class="container main-content-grid">
+                <aside class="sidebar filter-menu">
+                    <div class="sidebar__section">
+                        <h3 class="section-title">Categories</h3>
+                        <div class="keywords-list" id="keywords-list">
+                            {% for category_id in selected_categories %}
+                                {% for category in categories %}
+                                    {% if category.id == category_id|add:0 %}
+                                        <span class="keyword-tag"
+                                              data-keyword="{{ category.id }}">
+                                             {{ category.name }} <i
+                                                class="fa-solid fa-xmark remove-keyword-icon"></i>
+                                         </span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="sidebar__section">
+                        <h3 class="section-title">Product Type</h3>
+                        <div class="checkbox-group">
+                            {% for category in categories %}
+                                <label class="checkbox-container">
+                                    {{ category.name }}
+                                    <input type="checkbox"
+                                           name="category"
+                                           value="{{ category.id }}"
+                                           data-keyword="{{ category.name }}"
+                                           {% if category.id|stringformat:"s" in selected_categories %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            {% empty %}
+                                <p>No categories available</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+
+                    <button type="submit" class="filter-button">Apply Filters
+                    </button>
+                </aside>
+
+                <section class="products-area product-grid-section">
+                    <div class="search-sort-bar">
+                        <div class="search-input-wrapper">
+                            <label>
+                                <input type="text"
+                                       name="search"
+                                       placeholder="Search products..."
+                                       value="{{ search_query }}"
+                                       class="search-input"
+                                       id="search-field">
+                            </label>
+                            <button type="submit" class="search-button"
+                                    aria-label="Search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+
+                        <div class="sort-options">
+                            <button type="button"
+                                    class="sort-button {% if sort_by == 'newest' %}active-sort{% endif %}"
+                                    data-sort="newest">
+                                <span>New</span>
+                            </button>
+                            <button type="button"
+                                    class="sort-button {% if sort_by == 'price_asc' %}active-sort{% endif %}"
+                                    data-sort="price_asc">
+                                <span>Price ascending</span>
+                            </button>
+                            <button type="button"
+                                    class="sort-button {% if sort_by == 'price_desc' %}active-sort{% endif %}"
+                                    data-sort="price_desc">
+                                <span>Price descending</span>
+                            </button>
+                            <button type="button"
+                                    class="sort-button {% if sort_by == 'popularity' %}active-sort{% endif %}"
+                                    data-sort="popularity">
+                                <span>Rating</span>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <input type="hidden" name="sort" id="sort-input"
+                           value="{{ sort_by }}">
+
+                    <div class="product-grid">
+                        {% for product in page_obj %}
+                            <a href="{% url 'products:product-detail' product.slug %}"
+                               class="product-card-link">
+                                <div class="product-card">
+                                    <img src="{{ product.get_image_url }}"
+                                         alt="{{ product.name }}"
+                                         class="product-card__image">
+                                    <div class="product-card__info">
+                                        <h4 class="product-card__name">{{ product.name }}</h4>
+                                        <p class="product-card__price">
+                                            ${{ product.price }}</p>
+                                        <p class="product-card__description">{{ product.description|truncatechars:70 }}</p>
+
+                                        <div class="product-rating">
+                                            {% with avg_rating=product.reviews.all|avg_rating %}
+                                                {% for i in "12345" %}
+                                                    <i class="fa-solid fa-star {% if forloop.counter <= avg_rating %}filled{% endif %}"></i>
+                                                {% endfor %}
+                                                <span>({{ product.reviews.count }})</span>
+                                            {% endwith %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
                         {% empty %}
-                        <p>No categories available</p>
+                            <p class="no-products">No products found matching
+                                your criteria.</p>
                         {% endfor %}
                     </div>
-                </div>
-            </aside>
-
-            <section class="products-area product-grid-section">
-                <div class="search-sort-bar">
-                    <div class="search-input-wrapper">
-                        <label>
-                            <input type="text" placeholder="Search"
-                                   class="search-input">
-                        </label>
-                        <button class="search-button" aria-label="Search">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                    <div class="sort-options">
-                        <button class="sort-button active-sort">
-                            <span>New</span>
-                        </button>
-                        <button class="sort-button">Price ascending</button>
-                        <button class="sort-button">Price descending</button>
-                        <button class="sort-button">Rating</button>
-                    </div>
-                </div>
-
-                <div class="product-grid">
-                    {% for product in page_obj %}
-                        <a href="{% url 'products:product-detail' product.slug %}"
-                           class="product-card-link">
-                            <div class="product-card">
-                                <img src="
-                                        {% if product.image %}
-                                        {{ product.image.url }}
-
-                                    {% else %}{% static 'img/products/default_product.png' %}
-                                        {% endif %}"
-                                     alt="{{ product.name }}"
-                                     class="product-card__image">
-                                <div class="product-card__info">
-                                    <h4 class="product-card__name">{{ product.name }}</h4>
-                                    <p class="product-card__price">
-                                        ${{ product.price }}</p>
-                                    <p class="product-card__description">{{ product.description|truncatechars:70 }}</p>
-                                </div>
-                            </div>
-                        </a>
-                    {% empty %}
-                        <p>No products found.</p>
-                    {% endfor %}
-                </div>
-            </section>
-        </div>
+                </section>
+            </div>
+        </form>
 
         {% if is_paginated %}
             <div class="container">
                 <div class="pagination">
                     {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}"
+                        <a href="?{% modify_query page=page_obj.previous_page_number %}"
                            class="pagination__link pagination__link--prev">
                             <i class="fa-solid fa-arrow-left"></i>
                             <span>Previous</span>
                         </a>
                     {% else %}
                         <span class="pagination__link pagination__link--prev disabled">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <span>Previous</span>
-                    </span>
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Previous</span>
+                        </span>
                     {% endif %}
 
                     <div class="pagination-list">
@@ -109,23 +157,23 @@
                             {% if page_obj.number == num %}
                                 <span class="pagination__link active">{{ num }}</span>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <a href="?page={{ num }}"
+                                <a href="?{% modify_query page=num %}"
                                    class="pagination__link">{{ num }}</a>
                             {% endif %}
                         {% endfor %}
                     </div>
 
                     {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}"
+                        <a href="?{% modify_query page=page_obj.next_page_number %}"
                            class="pagination__link pagination__link--next">
                             <span>Next</span>
                             <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     {% else %}
                         <span class="pagination__link pagination__link--next disabled">
-                        <span>Next</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </span>
+                            <span>Next</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
                     {% endif %}
                 </div>
             </div>

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- General logic for all pages (Login/Logout Simulation) ---
     const loginForm = document.getElementById('login-form');
     const logoutButton = document.getElementById('logout-button');
+
     function checkLoginStatus() {
         if (localStorage.getItem('isLoggedIn') === 'true') {
             document.body.classList.add('user-logged-in');
@@ -10,14 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('user-logged-in');
         }
     }
-    // if (loginForm) {
-    //     loginForm.addEventListener('submit', function(e) {
-    //         e.preventDefault();
-    //         localStorage.setItem('isLoggedIn', 'true');
-    //         // const nextUrl = new URLSearchParams(window.location.search).get('next');
-    //         window.location.href = "/";
-    //     });
-    // }
+
     if (logoutButton) {
         logoutButton.addEventListener('click', function(e) {
             e.preventDefault();
@@ -27,59 +21,133 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     checkLoginStatus();
 
-
-    // --- Logic for the Main Page (home.html) ---
+    // --- Logic for Product List Page (Filtering, Sorting, Search) ---
     const homePageContent = document.querySelector('.main-content-grid');
     if (homePageContent) {
+        const mainFilterForm = document.getElementById('main-filter-form');
+        const sortInput = document.getElementById('sort-input');
+        const searchField = document.getElementById('search-field');
+        
+        // Отладка - проверяем, что все элементы найдены
+        console.log('Elements found:', {
+            mainFilterForm: !!mainFilterForm,
+            sortInput: !!sortInput,
+            searchField: !!searchField
+        });
+        
+        if (mainFilterForm) {
+            console.log('Form details:', {
+                id: mainFilterForm.id,
+                action: mainFilterForm.action,
+                method: mainFilterForm.method
+            });
+        }
+
         // 1. Sort Options Logic
         const sortButtons = document.querySelectorAll('.sort-options .sort-button');
         sortButtons.forEach(button => {
             button.addEventListener('click', function() {
+                const sortValue = this.dataset.sort;
+                console.log('Sort button clicked:', sortValue); // Отладка
+                
+                if (sortInput) {
+                    sortInput.value = sortValue;
+                    console.log('Sort input value set to:', sortInput.value); // Отладка
+                } else {
+                    console.error('Sort input not found!'); // Отладка
+                }
+
                 sortButtons.forEach(btn => btn.classList.remove('active-sort'));
                 this.classList.add('active-sort');
+
+                // Submit the main filter form
+                if (mainFilterForm) {
+                    console.log('Submitting form with sort:', sortValue); // Отладка
+                    console.log('Form action:', mainFilterForm.action); // Отладка
+                    console.log('Form method:', mainFilterForm.method); // Отладка
+                    mainFilterForm.submit();
+                } else {
+                    console.error('Main filter form not found!'); // Отладка
+                }
             });
         });
 
-
+        // 2. Search functionality - теперь работает через форму
+        if (searchField) {
+            // Поиск по Enter
+            searchField.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (mainFilterForm) {
+                        mainFilterForm.submit();
+                    }
+                }
+            });
+        }
 
         // 3. Filter Logic (Keywords and Checkboxes)
-        const keywordsList = document.querySelector('.keywords-list');
+        const keywordsList = document.getElementById('keywords-list');
         const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
 
         if (keywordsList && checkboxes.length > 0) {
-
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const keyword = this.dataset.keyword;
+                    const value = this.value;
+
                     if (this.checked) {
-                        if (!document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)) {
+                        if (!document.querySelector(`.keyword-tag[data-keyword="${value}"]`)) {
                             const newTag = document.createElement('span');
                             newTag.className = 'keyword-tag';
-                            newTag.setAttribute('data-keyword', keyword);
+                            newTag.setAttribute('data-keyword', value);
                             newTag.innerHTML = `${keyword} <i class="fa-solid fa-xmark remove-keyword-icon"></i>`;
                             keywordsList.appendChild(newTag);
                         }
                     } else {
-                        const tagToRemove = document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`);
+                        const tagToRemove = document.querySelector(`.keyword-tag[data-keyword="${value}"]`);
                         if (tagToRemove) {
                             tagToRemove.remove();
                         }
                     }
+
+                    // НЕ отправляем форму сразу - ждем нажатия кнопки "Apply Filters"
+                    // filterForm.submit();
                 });
             });
 
             keywordsList.addEventListener('click', function(event) {
-                const keywordIcon = event.target.closest('.remove-keyword-icon');
-                if (keywordIcon) {
-                    const keywordTag = keywordIcon.closest('.keyword-tag');
-                    const keywordText = keywordTag.dataset.keyword;
-                    const checkbox = document.querySelector(`.checkbox-container input[data-keyword="${keywordText}"]`);
+                if (event.target.closest('.remove-keyword-icon')) {
+                    event.preventDefault();
+                    const keywordTag = event.target.closest('.keyword-tag');
+                    const keywordValue = keywordTag.dataset.keyword;
+
+                    // Uncheck corresponding checkbox
+                    const checkbox = document.querySelector(`.checkbox-group input[value="${keywordValue}"]`);
                     if (checkbox) {
                         checkbox.checked = false;
+                        // НЕ отправляем форму сразу - ждем нажатия кнопки "Apply Filters"
+                        // filterForm.submit();
                     }
+
                     keywordTag.remove();
                 }
             });
+        }
+
+        // 4. Clear all filters button
+        const clearFiltersBtn = document.createElement('button');
+        clearFiltersBtn.textContent = 'Clear All Filters';
+        clearFiltersBtn.className = 'button button--secondary';
+        clearFiltersBtn.style.marginTop = '16px';
+        clearFiltersBtn.style.width = '100%';
+        clearFiltersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = window.location.pathname;
+        });
+
+        const filterButton = mainFilterForm.querySelector('.filter-button');
+        if (filterButton) {
+            filterButton.parentNode.insertBefore(clearFiltersBtn, filterButton.nextSibling);
         }
     }
 
@@ -93,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.closest('.accordion-item').classList.toggle('active');
             });
         }
+
         // "Add to Cart" Button and Counter
         const cartControls = document.querySelector('.cart-controls');
         if (cartControls) {
@@ -102,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const increaseBtn = quantityCounter.querySelector('[data-action="increase"]');
             const quantityValueSpan = quantityCounter.querySelector('.quantity-value');
             let quantity = 0;
+
             function updateView() {
                 if (quantity === 0) {
                     addToCartBtn.classList.remove('is-hidden');
@@ -112,9 +182,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     quantityValueSpan.textContent = `${quantity} in cart`;
                 }
             }
-            addToCartBtn.addEventListener('click', function() { quantity = 1; updateView(); });
-            decreaseBtn.addEventListener('click', function() { if (quantity > 0) { quantity--; updateView(); } });
-            increaseBtn.addEventListener('click', function() { quantity++; updateView(); });
+
+            addToCartBtn.addEventListener('click', function() {
+                quantity = 1;
+                updateView();
+            });
+
+            decreaseBtn.addEventListener('click', function() {
+                if (quantity > 0) {
+                    quantity--;
+                    updateView();
+                }
+            });
+
+            increaseBtn.addEventListener('click', function() {
+                quantity++;
+                updateView();
+            });
+
             updateView();
         }
     }
@@ -124,6 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cartPageContent) {
         const cartItemsList = document.getElementById('cart-items-list');
         const cartTotalPriceElem = document.getElementById('cart-total-price');
+
         function updateCartTotal() {
             let total = 0;
             document.querySelectorAll('.cart-item').forEach(item => {
@@ -134,85 +220,63 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             if (cartTotalPriceElem) cartTotalPriceElem.textContent = `$${total.toFixed(2)}`;
         }
+
         if (cartItemsList) {
             cartItemsList.addEventListener('click', function(event) {
                 const cartItem = event.target.closest('.cart-item');
                 if (!cartItem) return;
+
                 const quantityElem = cartItem.querySelector('.quantity-value-cart');
                 const itemTotalElem = cartItem.querySelector('[data-item-total-price]');
                 const basePrice = parseFloat(cartItem.dataset.price);
                 let quantity = parseInt(quantityElem.textContent);
+
                 if (event.target.closest('[data-action="increase"]')) {
                     quantity++;
                 } else if (event.target.closest('[data-action="decrease"]')) {
                     quantity = quantity > 1 ? quantity - 1 : 0;
                 }
+
                 if (event.target.closest('[data-action="remove"]') || quantity === 0) {
                     cartItem.remove();
                 } else {
                     quantityElem.textContent = quantity;
                     itemTotalElem.textContent = `$${(basePrice * quantity).toFixed(2)}`;
                 }
+
                 updateCartTotal();
             });
         }
         updateCartTotal();
     }
 
-    // --- Logic for Account and Admin Pages ---
-    const accountAdminWrapper = document.querySelector('.account-page-wrapper, .admin-page-wrapper');
-    if (accountAdminWrapper) {
-        // Account Page Tabs
-        const accountTabs = document.querySelectorAll('.account-tab');
-        const tabPanes = document.querySelectorAll('.tab-pane');
-        if (accountTabs.length > 0 && tabPanes.length > 0) {
-            accountTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    accountTabs.forEach(item => item.classList.remove('active'));
-                    tabPanes.forEach(pane => pane.classList.remove('active'));
-                    const targetPane = document.querySelector(this.dataset.tabTarget);
-                    this.classList.add('active');
-                    if (targetPane) targetPane.classList.add('active');
-                });
-            });
+    // --- URL Parameter Handling ---
+    function updateURLParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search');
+        const sortBy = urlParams.get('sort');
+        const categories = urlParams.getAll('category');
+
+        // Update search field
+        if (searchQuery && document.getElementById('search-field')) {
+            document.getElementById('search-field').value = searchQuery;
         }
 
-        // Admin Panel - Category Tags
-        const categoryTagsContainer = document.querySelector('.category-tags');
-        if (categoryTagsContainer) {
-            categoryTagsContainer.addEventListener('click', function(e) {
-                const clickedTag = e.target.closest('.category-tag');
-                if (clickedTag) {
-                    categoryTagsContainer.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
-                    clickedTag.classList.add('active');
-                }
-            });
+        // Update sort buttons
+        if (sortBy && document.querySelector(`.sort-button[data-sort="${sortBy}"]`)) {
+            document.querySelectorAll('.sort-button').forEach(btn => btn.classList.remove('active-sort'));
+            document.querySelector(`.sort-button[data-sort="${sortBy}"]`).classList.add('active-sort');
         }
 
-        // Image Upload Simulation
-        const uploadButton = document.getElementById('upload-image-btn');
-        const fileInput = document.getElementById('image-upload-input');
-
-        if (uploadButton && fileInput) {
-            uploadButton.addEventListener('click', function() {
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    const placeholder = document.querySelector('.image-upload-placeholder');
-
-                    reader.onload = function(e) {
-                        placeholder.innerHTML = '';
-                        placeholder.style.backgroundImage = `url('${e.target.result}')`;
-                        placeholder.style.backgroundSize = 'cover';
-                        placeholder.style.backgroundPosition = 'center';
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
+        // Update checkboxes
+        categories.forEach(categoryId => {
+            const checkbox = document.querySelector(`.checkbox-group input[value="${categoryId}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
     }
-});
+
+         updateURLParams();
+ 
+ });

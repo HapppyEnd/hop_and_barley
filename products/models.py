@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils.text import slugify
+
 from products.mixins import SlugMixin
 
 
@@ -41,7 +41,7 @@ class Product(JournalizedModel, SlugMixin):
                                  related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='product_images', blank=True,
-                              null=True)
+                              null=True, default='product_images/default.png')
     is_active = models.BooleanField(default=True)
     stock = models.PositiveIntegerField()
 
@@ -56,6 +56,13 @@ class Product(JournalizedModel, SlugMixin):
     def save(self, *args, **kwargs):
         self.generate_unique_slug(Product)
         super().save(*args, **kwargs)
+    
+    @property
+    def get_image_url(self):
+        """Возвращает URL изображения или изображение по умолчанию"""
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return '/static/img/products/default_product.png'
 
 
 class Review(JournalizedModel):

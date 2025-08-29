@@ -1,20 +1,55 @@
-from django.views.generic import ListView, DetailView
+from django.db.models import Avg, Q
+from django.views.generic import DetailView, ListView
 
-from products.models import Product, Category, Review
+from products.models import Category, Product, Review
 
 
 class ProductListView(ListView):
-    queryset = Product.objects.filter(
-        is_active=True).select_related('category')
     template_name = 'products/product-list.html'
-    slug_field = 'slug'
     context_object_name = 'products'
     paginate_by = 3
-    ordering = ('-created_at',)
+
+    def get_queryset(self):
+        queryset = Product.objects.filter(is_active=True).select_related(
+            'category')
+
+        category_ids = self.request.GET.getlist('category')
+        if category_ids:
+            queryset = queryset.filter(category_id__in=category_ids)
+
+        search_query = self.request.GET.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+
+        sort_by = self.request.GET.get('sort', 'newest')
+
+        if sort_by == 'price_asc':
+            queryset = queryset.order_by('price')
+        elif sort_by == 'price_desc':
+            queryset = queryset.order_by('-price')
+        elif sort_by == 'popularity':
+            queryset = queryset.annotate(
+                avg_rating=Avg('reviews__rating')
+            ).order_by('-avg_rating', '-created_at')
+        elif sort_by == 'newest':
+            queryset = queryset.order_by('-created_at')
+        else:
+            queryset = queryset.order_by('-created_at')
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
+
+        context['selected_categories'] = self.request.GET.getlist('category',
+                                                                  [])
+        context['search_query'] = self.request.GET.get('search', '')
+        context['sort_by'] = self.request.GET.get('sort', 'newest')
+
         return context
 
 
@@ -33,4 +68,3 @@ class ProductDetailView(DetailView):
         context['reviews'] = Review.objects.filter(
             product=self.object).select_related('user')
         return context
-

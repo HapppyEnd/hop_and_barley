@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
@@ -15,7 +15,7 @@ class UserLoginView(LoginView):
         email = self.request.session.get('register_email')
         if email:
             initial['username'] = email
-            # Очищаем сессию после использования
+            # Clear session after use
             del self.request.session['register_email']
             self.request.session.modified = True
         return initial
@@ -23,16 +23,22 @@ class UserLoginView(LoginView):
     def form_valid(self, form):
         remember_me = self.request.POST.get('remember_me') == 'on'
         if not remember_me:
-            # Если "запомнить меня" не отмечен, 
-            # сессия истечет при закрытии браузера
+            # If "remember me" is not checked,
+            # session will expire when browser closes
             self.request.session.set_expiry(0)
         else:
-            # Если отмечен, используем настройки из settings.py
+            # If checked, use settings from settings.py
             self.request.session.set_expiry(None)
         
-        # Убеждаемся, что сессия сохранена
+        # Ensure session is saved
         self.request.session.modified = True
+        messages.success(self.request, 'Successfully logged in!')
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 
+                       'Invalid email or password. Please try again.')
+        return super().form_invalid(form)
 
 
 class RegisterView(CreateView):
@@ -43,7 +49,7 @@ class RegisterView(CreateView):
     def form_valid(self, form):
         user = form.save()
     
-        # Сохраняем email в сессии для автозаполнения формы входа
+        # Save email in session for auto-filling login form
         self.request.session['register_email'] = user.email
         self.request.session.modified = True
 
@@ -51,3 +57,9 @@ class RegisterView(CreateView):
             self.request, messages.SUCCESS,
             'Registration successful! Please log in.')
         return super(RegisterView, self).form_valid(form)
+
+
+class UserLogoutView(LogoutView):
+    def dispatch(self, request, *args, **kwargs):
+        messages.success(request, 'Successfully logged out!')
+        return super().dispatch(request, *args, **kwargs)

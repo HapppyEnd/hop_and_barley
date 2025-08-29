@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -64,6 +65,19 @@ class Product(JournalizedModel, SlugMixin):
             return self.image.url
         return '/static/img/products/default_product.png'
 
+    def user_can_review(self, user):
+        """Проверяет, может ли пользователь оставить отзыв на товар."""
+        if not user.is_authenticated:
+            return False
+        
+        # Проверяем, есть ли у пользователя заказы с этим товаром
+        from orders.models import OrderItem
+        return OrderItem.objects.filter(
+            order__user=user,
+            order__status__in=['paid', 'shipped', 'delivered'],
+            product=self
+        ).exists()
+
 
 class Review(JournalizedModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE,
@@ -84,3 +98,16 @@ class Review(JournalizedModel):
 
     def __str__(self):
         return f'{self.user.username}: {self.rating} - {self.comment}'
+
+    def clean(self):
+        """Проверяет, что пользователь покупал товар."""
+        super().clean()
+        if not self.product.user_can_review(self.user):
+            raise ValidationError(
+                'You can only review products you have purchased.'
+            )
+
+    def save(self, *args, **kwargs):
+        """Проверяет валидность перед сохранением."""
+        self.clean()
+        super().save(*args, **kwargs)

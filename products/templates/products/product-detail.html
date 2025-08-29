@@ -26,21 +26,37 @@
                         <p>{{ product.description }}</p>
                     </div>
                     <div class="cart-controls">
-                        <button class="button button--primary add-to-cart-button"
-                                id="add-to-cart-btn">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                            <span>Add to Cart</span>
-                        </button>
-                        <div class="quantity-counter is-hidden"
-                             id="quantity-counter">
-                            <button class="quantity-btn" data-action="decrease"
-                                    aria-label="Decrease quantity"><i
-                                    class="fa-solid fa-minus"></i></button>
-                            <span class="quantity-value">1 in cart</span>
-                            <button class="quantity-btn" data-action="increase"
-                                    aria-label="Increase quantity"><i
-                                    class="fa-solid fa-plus"></i></button>
+                        <form method="post" action="{% url 'orders:cart_add' product.id %}" 
+                              class="d-inline">
+                            {% csrf_token %}
+                            <div class="quantity-selector mb-3">
+                                <label for="quantity" class="form-label">Quantity:</label>
+                                <div class="quantity-selector-product">
+                                    <button type="button" class="quantity-btn-product quantity-btn-minus" onclick="changeQuantity(-1, {{ product.stock }})">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" name="quantity" id="quantity" 
+                                           value="1" min="1" max="{{ product.stock }}" 
+                                           class="quantity-input-product">
+                                    <button type="button" class="quantity-btn-product quantity-btn-plus" onclick="changeQuantity(1, {{ product.stock }})">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Available: {{ product.stock }}</small>
+                            </div>
+                            <button type="submit" class="button button--primary add-to-cart-button">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span>Add to Cart</span>
+                            </button>
+                        </form>
+                        
+                        {% if cart_quantity > 0 %}
+                        <div class="mt-2">
+                            <small class="text-success">
+                                In cart: {{ cart_quantity }} items
+                            </small>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </section>
@@ -113,5 +129,4 @@
             </section>
         </div>
     </main>
-
 {% endblock %}

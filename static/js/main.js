@@ -151,6 +151,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // --- Messages Auto-hide ---
+    const messages = document.querySelectorAll('.message');
+    messages.forEach(message => {
+        setTimeout(() => {
+            message.style.opacity = '0';
+            message.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                message.remove();
+            }, 300);
+        }, 5000); // Hide after 5 seconds
+    });
+
     // --- Logic for Product Detail Pages (product-*.html) ---
     const productPageContent = document.querySelector('.page-product');
     if (productPageContent) {
@@ -158,7 +170,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const accordionTitle = document.querySelector('.accordion-title');
         if (accordionTitle) {
             accordionTitle.addEventListener('click', function() {
-                this.closest('.accordion-item').classList.toggle('active');
+                const accordionItem = this.closest('.accordion-item');
+                const accordionContent = accordionItem.querySelector('.accordion-content');
+                const accordionIcon = this.querySelector('.accordion-icon');
+                
+                accordionItem.classList.toggle('active');
+                
+                if (accordionItem.classList.contains('active')) {
+                    accordionContent.style.display = 'block';
+                    accordionIcon.style.transform = 'rotate(180deg)';
+                } else {
+                    accordionContent.style.display = 'none';
+                    accordionIcon.style.transform = 'rotate(0deg)';
+                }
             });
         }
 
@@ -201,6 +225,31 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             updateView();
+        }
+
+        // Product page quantity selector
+        const quantitySelector = document.querySelector('.quantity-selector-product');
+        if (quantitySelector) {
+            const quantityInput = quantitySelector.querySelector('.quantity-input-product');
+            const decreaseBtn = quantitySelector.querySelector('.quantity-btn-product:first-child');
+            const increaseBtn = quantitySelector.querySelector('.quantity-btn-product:last-child');
+            
+            if (decreaseBtn && increaseBtn && quantityInput) {
+                decreaseBtn.addEventListener('click', function() {
+                    let currentQuantity = parseInt(quantityInput.value) || 1;
+                    if (currentQuantity > 1) {
+                        quantityInput.value = currentQuantity - 1;
+                    }
+                });
+                
+                increaseBtn.addEventListener('click', function() {
+                    let currentQuantity = parseInt(quantityInput.value) || 1;
+                    const maxStock = parseInt(quantityInput.getAttribute('max')) || 999;
+                    if (currentQuantity < maxStock) {
+                        quantityInput.value = currentQuantity + 1;
+                    }
+                });
+            }
         }
     }
 
@@ -278,5 +327,98 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
          updateURLParams();
+ 
+    // --- Cart Quantity Update Functions ---
+    window.updateQuantity = function(button, change, maxStock) {
+        const quantityInput = button.parentNode.querySelector('.quantity-input-cart');
+        const hiddenInput = button.parentNode.querySelector('.quantity-input');
+        
+        if (!quantityInput || !hiddenInput) {
+            return;
+        }
+        
+        let currentQuantity = parseInt(quantityInput.value) || 0;
+        const newQuantity = currentQuantity + change;
+        
+        if (newQuantity < 1) {
+            const cartItem = button.closest('.cart-item');
+            if (cartItem) {
+                const removeForm = cartItem.querySelector('form[action*="cart/remove"]');
+                if (removeForm) {
+                    removeForm.submit();
+                }
+            }
+            return;
+        }
+        
+        if (newQuantity > maxStock) {
+            currentQuantity = maxStock;
+        } else {
+            currentQuantity = newQuantity;
+        }
+        
+        quantityInput.value = currentQuantity;
+        hiddenInput.value = currentQuantity;
+        
+        setTimeout(() => {
+            const form = button.closest('form');
+            if (form) {
+                form.submit();
+            }
+        }, 100);
+    };
+
+    // --- Product Page Quantity Update Functions ---
+    window.changeQuantity = function(change, maxStock) {
+        const quantityInput = document.getElementById('quantity');
+        
+        if (!quantityInput) {
+            return;
+        }
+        
+        let currentQuantity = parseInt(quantityInput.value) || 1;
+        let newQuantity = currentQuantity + change;
+        
+        if (newQuantity < 1) {
+            newQuantity = 1;
+        } else if (newQuantity > maxStock) {
+            newQuantity = maxStock;
+        }
+        
+        quantityInput.value = newQuantity;
+    };
+
+    window.updateQuantityDirect = function(input, maxStock) {
+        let newQuantity = parseInt(input.value) || 1;
+        
+        if (newQuantity < 1) {
+            newQuantity = 1;
+        } else if (newQuantity > maxStock) {
+            newQuantity = maxStock;
+        }
+        
+        input.value = newQuantity;
+        
+        const hiddenInput = input.parentNode.querySelector('.quantity-input');
+        if (hiddenInput) {
+            hiddenInput.value = newQuantity;
+        }
+        
+        const form = input.closest('form');
+        if (form) {
+            form.submit();
+        }
+    };
+
+    // --- Cart Button Event Listeners ---
+    const quantityButtons = document.querySelectorAll('.quantity-btn-cart');
+    quantityButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            this.disabled = true;
+            setTimeout(() => {
+                this.disabled = false;
+            }, 500);
+        });
+    });
  
  });

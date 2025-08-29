@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart | Hop & Barley{% endblock %}
+
+{% block content %}
+<main class="cart-page-wrapper">
+  <div class="cart-container">
+    <h1 class="cart-title">Shopping Cart</h1>
+
+    {% if cart %}
+    <div class="cart-items-list" id="cart-items-list">
+      {% for item in cart %}
+      <div class="cart-item">
+        {% if item.image %}
+          <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-item__image">
+        {% else %}
+          <img src="{% static 'img/products/caramel_malt.jpg' %}" alt="{{ item.name }}" class="cart-item__image">
+        {% endif %}
+        <div class="cart-item__body">
+          <div class="cart-item__details">
+            <h2 class="cart-item__name">{{ item.name }}</h2>
+            <div class="cart-item__price-info">
+              <p class="cart-item__price" data-item-price-per-unit>{{ item.price }}</p>
+              <span class="cart-item__price-tag">per unit</span>
+              <p class="cart-item__total" data-item-total-price>{{ item.total_price }}</p>
+              <span class="cart-item__total-tag">total</span>
+            </div>
+          </div>
+          <div class="cart-item__actions">
+            <div class="cart-item__quantity-selector">
+              <form method="post" action="{% url 'orders:cart_update' item.product_id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="button" class="quantity-btn-cart quantity-btn-minus" onclick="updateQuantity(this, -1, {{ item.stock }})">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" class="quantity-input-cart" value="{{ item.quantity }}" min="1" max="{{ item.stock }}" onchange="updateQuantityDirect(this, {{ item.stock }})">
+                <button type="button" class="quantity-btn-cart quantity-btn-plus" onclick="updateQuantity(this, 1, {{ item.stock }})">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <input type="hidden" name="quantity" class="quantity-input" value="{{ item.quantity }}">
+              </form>
+            </div>
+            <form method="post" action="{% url 'orders:cart_remove' item.product_id %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="button button--secondary">
+                <i class="fas fa-trash"></i> Remove
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      
+      <div class="cart-summary">
+        <div class="cart-total">
+          <h3>Total: <span class="cart-total-price">{{ cart.get_total_price }}</span></h3>
+        </div>
+        <div class="cart-actions">
+          <a href="{% url 'products:product-list' %}" class="button button--secondary">Continue Shopping</a>
+          <a href="{% url 'orders:checkout' %}" class="button button--primary">Proceed to Checkout</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center">
+      <h3>Your cart is empty</h3>
+      <p>Add items to continue shopping</p>
+      <a href="{% url 'products:product-list' %}" class="button button--primary">
+        Browse Products
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</main>
+
+
+{% endblock %}

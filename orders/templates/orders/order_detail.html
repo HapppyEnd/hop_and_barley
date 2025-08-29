@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Details | Hop & Barley{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="order-details-section">
+        <div class="order-header">
+            <h2>Order #{{ order.id }}</h2>
+            <div class="order-status">
+                <span class="status-badge status-badge--{{ order.status }}">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+            <p class="order-date">Created: {{ order.created_at|date:"M d, Y H:i" }}</p>
+        </div>
+        
+        <div class="order-content">
+            <div class="order-items-section">
+                <h3>Order Items</h3>
+                <div class="order-items-grid">
+                    {% for item in order.items.all %}
+                    <div class="order-item-card">
+                        <div class="order-item-image">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                            {% else %}
+                                <img src="{% static 'img/products/caramel_malt.jpg' %}" alt="{{ item.product.name }}">
+                            {% endif %}
+                        </div>
+                        <div class="order-item-info">
+                            <h4 class="order-item-name">{{ item.product.name }}</h4>
+                            <p class="order-item-details">
+                                <span>Quantity: {{ item.quantity }}</span>
+                                <span>Price per unit: {{ item.price }}</span>
+                            </p>
+                            <p class="order-item-total">Total: {{ item.total }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="order-summary-section">
+                <div class="summary-card">
+                    <h3>Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>{{ order.total_price }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span>Free</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-row summary-total">
+                        <span>Total:</span>
+                        <span>{{ order.total_price }}</span>
+                    </div>
+                </div>
+                
+                <div class="shipping-card">
+                    <h3>Shipping Information</h3>
+                    <div class="shipping-info">
+                        <p><strong>Address:</strong></p>
+                        <p>{{ order.shipping_address }}</p>
+                    </div>
+                </div>
+                
+                <div class="order-actions">
+                    <a href="{% url 'orders:order_list' %}" class="button button--secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

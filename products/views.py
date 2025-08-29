@@ -67,4 +67,10 @@ class ProductDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['reviews'] = Review.objects.filter(
             product=self.object).select_related('user')
+        
+        # Добавляем информацию о корзине
+        from orders.cart import Cart
+        cart = Cart(self.request)
+        context['cart_quantity'] = cart.get_product_quantity(self.object.id)
+        
         return context

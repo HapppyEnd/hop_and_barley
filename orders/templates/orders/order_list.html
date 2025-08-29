@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders | Hop & Barley{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="orders-page">
+        <h1 class="orders-page-title">My Orders</h1>
+        
+        {% if orders %}
+            <div class="orders-list">
+                {% for order in orders %}
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-header-main">
+                            <h3 class="order-number">Order #{{ order.id }}</h3>
+                            <span class="status-badge status-badge--{{ order.status }}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+                        <p class="order-creation-date">
+                            Created: {{ order.created_at|date:"M d, Y H:i" }}
+                        </p>
+                    </div>
+                    <div class="order-card-content">
+                        <div class="order-items-summary">
+                            <h4>Items:</h4>
+                            {% for item in order.items.all %}
+                            <div class="order-item-summary">
+                                <span class="item-name">{{ item.product.name }} × {{ item.quantity }}</span>
+                                <span class="item-total">{{ item.total }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="order-summary">
+                            <h4>Total: {{ order.total_price }}</h4>
+                            <p class="shipping-address">
+                                <strong>Shipping Address:</strong> {{ order.shipping_address }}
+                            </p>
+                            <a href="{% url 'orders:order_detail' order.id %}" 
+                               class="button button--primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-orders">
+                <h3>You don't have any orders yet</h3>
+                <p>Start by browsing our products</p>
+                <a href="{% url 'products:product-list' %}" class="button button--primary">
+                    Browse Products
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

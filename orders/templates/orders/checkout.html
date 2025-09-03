@@ -15,6 +15,13 @@
                 <h2 class="checkout-section__title">Shipping information</h2>
                 <div class="checkout-form-group">
                     <label for="shipping_address">Shipping address</label>
+                    {% if user.city or user.address %}
+                    <div class="address-autofill">
+                        <button type="button" id="autofill-address" class="button button--secondary button--small">
+                            <i class="fas fa-map-marker-alt"></i> Use my saved address
+                        </button>
+                    </div>
+                    {% endif %}
                     <textarea id="shipping_address" name="shipping_address" 
                               class="Textarea" placeholder="Enter your full shipping address" 
                               rows="3" required></textarea>
@@ -50,4 +57,44 @@
         </form>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const autofillButton = document.getElementById('autofill-address');
+    const addressTextarea = document.getElementById('shipping_address');
+    
+    if (autofillButton && addressTextarea) {
+        autofillButton.addEventListener('click', function() {
+            // Get user's saved address data
+            const userCity = '{{ user.city|default:"" }}';
+            const userAddress = '{{ user.address|default:"" }}';
+            
+            // Combine city and address
+            let fullAddress = '';
+            if (userAddress) {
+                fullAddress = userAddress;
+            }
+            if (userCity) {
+                if (fullAddress) {
+                    fullAddress += ', ' + userCity;
+                } else {
+                    fullAddress = userCity;
+                }
+            }
+            
+            // Fill the textarea
+            if (fullAddress) {
+                addressTextarea.value = fullAddress;
+                // Add visual feedback
+                autofillButton.innerHTML = '<i class="fas fa-check"></i> Address filled!';
+                autofillButton.classList.add('button--success');
+                setTimeout(() => {
+                    autofillButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Use my saved address';
+                    autofillButton.classList.remove('button--success');
+                }, 2000);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

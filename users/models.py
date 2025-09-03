@@ -10,6 +10,8 @@ class User(AbstractUser):
     phone = PhoneNumberField(null=True, blank=True)
     image = models.ImageField(upload_to='profile_image', null=True, blank=True,
                               default='profile_image/default.jpg')
+    city = models.CharField(max_length=100, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'User'
@@ -18,3 +20,8 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    @property
+    def full_name(self):
+        """Returns the user's full name."""
+        return f"{self.first_name} {self.last_name}".strip() or self.username

@@ -88,6 +88,10 @@
 }
 
 /* Base styles */
+html, body {
+    height: 100%;
+}
+
 body {
     font-family: var(--font-family);
     color: var(--black-main);
@@ -95,6 +99,9 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 *, *::before, *::after {
@@ -209,6 +216,22 @@ header {
 
 .button--secondary:hover {
     background-color: var(--slate-200);
+}
+
+.button--small {
+    padding: 8px 16px;
+    font-size: 14px;
+    height: auto;
+}
+
+.button--success {
+    background-color: var(--green);
+    color: white;
+    border-color: var(--green);
+}
+
+.address-autofill {
+    margin-bottom: 8px;
 }
 
 .filter-button {
@@ -584,26 +607,33 @@ header {
     padding: 8px 12px;
 }
 
+/* Main content wrapper */
+main {
+    flex: 1;
+    width: 100%;
+}
+
 /* Footer */
 footer {
     width: 100%;
-    padding: 48px 64px 24px 64px;
+    padding: 16px 20px 12px 20px;
     background-color: var(--black-main);
     color: var(--white-text);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 48px;
+    gap: 16px;
+    margin-top: auto;
 }
 
 .footer__hops-logo {
-    width: 483.92px;
-    height: 263.53px;
+    width: 200px;
+    height: 100px;
 }
 
 .footer__nav {
-    width: 640px;
-    height: 37px;
+    width: 400px;
+    height: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -620,10 +650,10 @@ footer {
 }
 
 .footer__nav a {
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1;
     color: var(--white-text);
-    padding: 8px;
+    padding: 4px;
     transition: opacity 0.2s ease;
 }
 
@@ -632,8 +662,8 @@ footer {
 }
 
 .footer__copyright {
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 10px;
+    line-height: 14px;
     color: var(--white-text);
 }
 
@@ -651,11 +681,12 @@ footer {
 .auth-page-wrapper {
     position: relative;
     width: 100%;
-    height: 757px;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    padding: 40px 0;
 }
 
 .auth-background {
@@ -691,6 +722,162 @@ footer {
     flex-direction: column;
     align-items: center;
     gap: 24px;
+}
+
+.auth-container--account-edit {
+    width: 600px;
+    height: auto;
+    padding: 20px;
+    background: var(--background-default);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.auth-container--account-edit .auth-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--black-main);
+    margin-bottom: 4px;
+}
+
+.auth-container--account-edit .auth-form {
+    gap: 16px;
+}
+
+.auth-container--account-edit .InputField {
+    gap: 6px;
+}
+
+.auth-subtitle {
+    color: var(--grey-text);
+    margin-bottom: 0;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--grey-text);
+    margin-top: 4px;
+    display: block;
+    line-height: 1.3;
+}
+
+.auth-links {
+    margin-top: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.alert {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert p {
+    margin: 0;
+}
+
+/* Account Edit Page - Standard Form */
+.account-edit-page {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--black-main);
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.account-edit-form {
+    background-color: var(--background-default);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black-main);
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: var(--background-grey);
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(2, 84, 45, 0.2);
+}
+
+.help-text {
+    display: block;
+    font-size: 12px;
+    color: var(--grey-text);
+    margin-top: 4px;
+}
+
+.form-errors {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    color: #721c24;
+    font-size: 14px;
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.form-actions .button {
+    padding: 10px 20px;
+    font-size: 14px;
 }
 
 .Legend {
@@ -744,6 +931,80 @@ footer {
     box-shadow: 0 0 0 3px rgba(2, 84, 45, 0.2);
 }
 
+/* Django form fields styling */
+.InputField input[type="text"],
+.InputField input[type="email"],
+.InputField input[type="password"],
+.InputField input[type="tel"],
+.InputField input[type="url"],
+.InputField textarea,
+.InputField select {
+    width: 100%;
+    height: 40px;
+    padding: 12px 16px;
+    background-color: var(--background-grey);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--black-main);
+    font-family: var(--font-family);
+    box-sizing: border-box;
+}
+
+.InputField textarea {
+    height: auto;
+    min-height: 80px;
+    resize: vertical;
+}
+
+.InputField input[type="text"]:focus,
+.InputField input[type="email"]:focus,
+.InputField input[type="password"]:focus,
+.InputField input[type="tel"]:focus,
+.InputField input[type="url"]:focus,
+.InputField textarea:focus,
+.InputField select:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(2, 84, 45, 0.2);
+}
+
+.InputField input[type="text"]:hover,
+.InputField input[type="email"]:hover,
+.InputField input[type="password"]:hover,
+.InputField input[type="tel"]:hover,
+.InputField input[type="url"]:hover,
+.InputField textarea:hover,
+.InputField select:hover {
+    border-color: var(--border-dark-grey);
+}
+
+/* Error message styling */
+.error-message {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 4px;
+    display: block;
+}
+
+.form-errors {
+    background-color: #fff8f8;
+    border: 1px solid #e74c3c;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+.form-errors .error-message {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.form-errors .error-message:last-child {
+    margin-bottom: 0;
+}
+
 
 .CheckboxField {
     width: 100%;
@@ -754,6 +1015,64 @@ footer {
     font-size: 16px;
     line-height: 1;
     color: var(--black-main);
+}
+
+/* Checkbox styling for auth forms */
+.InputField .checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--black-main);
+    margin: 0;
+    padding: 0;
+}
+
+.InputField .checkbox-container input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    accent-color: var(--green);
+    flex-shrink: 0;
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    z-index: 1;
+}
+
+.InputField .checkbox-container .checkbox-label {
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--black-main);
+    position: relative;
+    z-index: 2;
+}
+
+/* Auth links styling */
+.auth-links {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.auth-links p {
+    margin: 8px 0;
+}
+
+.auth-links a {
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
 }
 
 /* ButtonGroup  */
@@ -1756,6 +2075,145 @@ body.user-logged-in .header__user-actions {
 
 .order-date {
     color: var(--grey-text);
+}
+
+/* Order Filters */
+.order-filters {
+    background-color: var(--background-default);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 160px;
+}
+
+.filter-group label {
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--black-main);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.filter-group label i {
+    color: var(--green);
+    font-size: 10px;
+}
+
+.filter-select {
+    width: 100%;
+    height: 36px;
+    padding: 8px 12px;
+    background-color: var(--background-grey);
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--black-main);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(2, 84, 45, 0.2);
+}
+
+.filter-input {
+    width: 100%;
+    height: 36px;
+    padding: 8px 12px;
+    background-color: var(--background-grey);
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--black-main);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(2, 84, 45, 0.2);
+}
+
+.filter-input::placeholder {
+    color: var(--grey-text);
+}
+
+.filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-self: end;
+}
+
+.filter-actions .button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    height: 36px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+/* Status Badge Improvements */
+.order-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.order-status--pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.order-status--paid {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.order-status--shipped {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+.order-status--delivered {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.order-status--canceled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
 /* Pagination for Account Page */

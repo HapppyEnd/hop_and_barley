@@ -19,7 +19,7 @@ class Order(models.Model):
     )
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             related_name='orders')
+                             related_name='orders') 
     status = models.CharField(choices=STATUS_CHOICES, default='pending',
                               max_length=20)
     shipping_address = models.TextField()

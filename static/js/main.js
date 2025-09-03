@@ -1,3 +1,52 @@
+// --- Product Page Quantity Update Functions ---
+window.changeQuantity = function(change, maxStock, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    const quantityInput = document.getElementById('quantity');
+    
+    if (!quantityInput) {
+        return;
+    }
+    
+    let currentQuantity = parseInt(quantityInput.value) || 1;
+    let newQuantity = currentQuantity + change;
+    
+    if (newQuantity < 1) {
+        newQuantity = 1;
+    } else if (newQuantity > maxStock) {
+        newQuantity = maxStock;
+    }
+    
+    quantityInput.value = newQuantity;
+};
+
+window.updateQuantityDirect = function(input, maxStock) {
+    let newQuantity = parseInt(input.value) || 1;
+    
+    if (newQuantity < 1) {
+        newQuantity = 1;
+    } else if (newQuantity > maxStock) {
+        newQuantity = maxStock;
+    }
+    
+    input.value = newQuantity;
+    
+    const hiddenInput = input.parentNode.querySelector('.quantity-input');
+    if (hiddenInput) {
+        hiddenInput.value = newQuantity;
+    }
+    
+    const form = input.closest('form');
+    if (form) {
+        setTimeout(() => {
+            form.submit();
+        }, 100);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- General logic for all pages (Login/Logout Simulation) ---
@@ -191,66 +240,47 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cartControls) {
             const addToCartBtn = cartControls.querySelector('#add-to-cart-btn');
             const quantityCounter = cartControls.querySelector('#quantity-counter');
-            const decreaseBtn = quantityCounter.querySelector('[data-action="decrease"]');
-            const increaseBtn = quantityCounter.querySelector('[data-action="increase"]');
-            const quantityValueSpan = quantityCounter.querySelector('.quantity-value');
-            let quantity = 0;
-
-            function updateView() {
-                if (quantity === 0) {
-                    addToCartBtn.classList.remove('is-hidden');
-                    quantityCounter.classList.add('is-hidden');
-                } else {
-                    addToCartBtn.classList.add('is-hidden');
-                    quantityCounter.classList.remove('is-hidden');
-                    quantityValueSpan.textContent = `${quantity} in cart`;
-                }
-            }
-
-            addToCartBtn.addEventListener('click', function() {
-                quantity = 1;
-                updateView();
-            });
-
-            decreaseBtn.addEventListener('click', function() {
-                if (quantity > 0) {
-                    quantity--;
-                    updateView();
-                }
-            });
-
-            increaseBtn.addEventListener('click', function() {
-                quantity++;
-                updateView();
-            });
-
-            updateView();
-        }
-
-        // Product page quantity selector
-        const quantitySelector = document.querySelector('.quantity-selector-product');
-        if (quantitySelector) {
-            const quantityInput = quantitySelector.querySelector('.quantity-input-product');
-            const decreaseBtn = quantitySelector.querySelector('.quantity-btn-product:first-child');
-            const increaseBtn = quantitySelector.querySelector('.quantity-btn-product:last-child');
             
-            if (decreaseBtn && increaseBtn && quantityInput) {
+            // Only proceed if quantityCounter exists
+            if (quantityCounter) {
+                const decreaseBtn = quantityCounter.querySelector('[data-action="decrease"]');
+                const increaseBtn = quantityCounter.querySelector('[data-action="increase"]');
+                const quantityValueSpan = quantityCounter.querySelector('.quantity-value');
+                let quantity = 0;
+
+                function updateView() {
+                    if (quantity === 0) {
+                        addToCartBtn.classList.remove('is-hidden');
+                        quantityCounter.classList.add('is-hidden');
+                    } else {
+                        addToCartBtn.classList.add('is-hidden');
+                        quantityCounter.classList.remove('is-hidden');
+                        quantityValueSpan.textContent = `${quantity} in cart`;
+                    }
+                }
+
+                addToCartBtn.addEventListener('click', function() {
+                    quantity = 1;
+                    updateView();
+                });
+
                 decreaseBtn.addEventListener('click', function() {
-                    let currentQuantity = parseInt(quantityInput.value) || 1;
-                    if (currentQuantity > 1) {
-                        quantityInput.value = currentQuantity - 1;
+                    if (quantity > 0) {
+                        quantity--;
+                        updateView();
                     }
                 });
-                
+
                 increaseBtn.addEventListener('click', function() {
-                    let currentQuantity = parseInt(quantityInput.value) || 1;
-                    const maxStock = parseInt(quantityInput.getAttribute('max')) || 999;
-                    if (currentQuantity < maxStock) {
-                        quantityInput.value = currentQuantity + 1;
-                    }
+                    quantity++;
+                    updateView();
                 });
+
+                updateView();
             }
         }
+
+
     }
 
     // --- Logic for Cart Page (cart.html) ---
@@ -368,47 +398,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     };
 
-    // --- Product Page Quantity Update Functions ---
-    window.changeQuantity = function(change, maxStock) {
-        const quantityInput = document.getElementById('quantity');
-        
-        if (!quantityInput) {
-            return;
-        }
-        
-        let currentQuantity = parseInt(quantityInput.value) || 1;
-        let newQuantity = currentQuantity + change;
-        
-        if (newQuantity < 1) {
-            newQuantity = 1;
-        } else if (newQuantity > maxStock) {
-            newQuantity = maxStock;
-        }
-        
-        quantityInput.value = newQuantity;
-    };
 
-    window.updateQuantityDirect = function(input, maxStock) {
-        let newQuantity = parseInt(input.value) || 1;
-        
-        if (newQuantity < 1) {
-            newQuantity = 1;
-        } else if (newQuantity > maxStock) {
-            newQuantity = maxStock;
-        }
-        
-        input.value = newQuantity;
-        
-        const hiddenInput = input.parentNode.querySelector('.quantity-input');
-        if (hiddenInput) {
-            hiddenInput.value = newQuantity;
-        }
-        
-        const form = input.closest('form');
-        if (form) {
-            form.submit();
-        }
-    };
+
+
 
     // --- Cart Button Event Listeners ---
     const quantityButtons = document.querySelectorAll('.quantity-btn-cart');
@@ -420,5 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         });
     });
+
+
  
  });

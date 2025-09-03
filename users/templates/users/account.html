@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Account | Hop & Barley{% endblock %}
+
+{% block content %}
+<!-- Main Content -->
+<main class="account-page-wrapper">
+  <div class="account-container">
+    <!-- Tabs Navigation -->
+    <div class="account-tabs">
+      <button class="account-tab active" data-tab-target="#order-history">Order History</button>
+      <button class="account-tab" data-tab-target="#account-info">Account Information</button>
+    </div>
+
+    <!-- Tabs Content -->
+    <div class="tab-content">
+      <!-- Order History Panel -->
+      <div id="order-history" class="tab-pane active">
+        <!-- Filters -->
+        <div class="order-filters">
+          <form method="get" class="filter-form">
+            <div class="filter-group">
+              <label for="status">
+                <i class="fas fa-filter"></i> Status
+              </label>
+              <select name="status" id="status" class="filter-select">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                  <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="search">
+                <i class="fas fa-search"></i> Search
+              </label>
+              <input type="text" name="search" id="search" class="filter-input" 
+                     placeholder="Order ID or address..." value="{{ search_query }}">
+            </div>
+            <div class="filter-actions">
+              <button type="submit" class="button button--primary">
+                <i class="fas fa-filter"></i> Apply Filters
+              </button>
+              {% if status_filter or search_query %}
+                <a href="{% url 'users:account' %}" class="button button--secondary">
+                  <i class="fas fa-times"></i> Clear
+                </a>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+
+        <div class="order-history-table">
+          <!-- Table Header -->
+          <div class="order-table-header">
+            <div class="order-table-cell">Order Details</div>
+            <div class="order-table-cell">Order Status</div>
+            <div class="order-table-cell">Total</div>
+            <div class="order-table-cell">Actions</div>
+          </div>
+          <!-- Table Body -->
+          <div class="order-table-body">
+            {% for order in orders %}
+            <div class="order-table-row">
+              <div class="order-table-cell">
+                <span class="order-id">#{{ order.id }}</span>
+                <span class="order-date">{{ order.created_at|date:"d M Y" }}</span>
+              </div>
+              <div class="order-table-cell">
+                <span class="order-status order-status--{{ order.status }}">{{ order.get_status_display }}</span>
+              </div>
+              <div class="order-table-cell">
+                <span class="order-total">{{ order.total_price }}</span>
+              </div>
+              <div class="order-table-cell">
+                <a href="{% url 'orders:order_detail' order.id %}" class="button button--small">View Details</a>
+              </div>
+            </div>
+            {% empty %}
+            <div class="order-table-row">
+              <div class="order-table-cell" colspan="4">
+                <p class="no-orders">No orders found.</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if orders.has_other_pages %}
+        <div class="account-pagination">
+          {% if orders.has_previous %}
+            <a href="?page={{ orders.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" 
+               class="pagination-link-account">← Previous</a>
+          {% else %}
+            <span class="pagination-link-account disabled">← Previous</span>
+          {% endif %}
+          
+          <span class="pagination-info">
+            Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+          </span>
+          
+          {% if orders.has_next %}
+            <a href="?page={{ orders.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" 
+               class="pagination-link-account">Next →</a>
+          {% else %}
+            <span class="pagination-link-account disabled">Next →</span>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Account Information Panel -->
+      <div id="account-info" class="tab-pane">
+        <div class="account-form-container">
+          <h2 class="account-form-title">Personal Info</h2>
+          
+          <div class="account-info-display">
+            <div class="info-item">
+              <label>Full Name:</label>
+              <span>{{ user.full_name|default:"Not set" }}</span>
+            </div>
+            <div class="info-item">
+              <label>Email:</label>
+              <span>{{ user.email }}</span>
+            </div>
+            <div class="info-item">
+              <label>Phone:</label>
+              <span>{{ user.phone.as_international|default:"Not set" }}</span>
+            </div>
+            <div class="info-item">
+              <label>City:</label>
+              <span>{{ user.city|default:"Not set" }}</span>
+            </div>
+            <div class="info-item">
+              <label>Address:</label>
+              <span>{{ user.address|default:"Not set"|linebreaks }}</span>
+            </div>
+          </div>
+          
+          <div class="account-actions">
+            <a href="{% url 'users:account_edit' %}" class="button button--primary button--full-width">Edit Profile</a>
+            <a href="{% url 'users:password_change' %}" class="button button--secondary button--full-width">Change Password</a>
+            <form action="{% url 'users:logout' %}" method="post" style="margin-top: 10px;">
+              {% csrf_token %}
+              <button type="submit" class="button button--secondary button--full-width">Logout</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+.account-info-display {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.account-info-display .info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.account-info-display .info-item:last-child {
+  border-bottom: none;
+}
+
+.account-info-display .info-item label {
+  font-weight: 600;
+  color: #2c3e50;
+  min-width: 120px;
+}
+
+.account-info-display .info-item span {
+  color: #555;
+  text-align: right;
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.button--full-width {
+  width: 100%;
+  text-align: center;
+}
+</style>
+
+<script>
+// Tab switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const tabs = document.querySelectorAll('.account-tab');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-tab-target');
+      
+      // Remove active class from all tabs and panes
+      tabs.forEach(t => t.classList.remove('active'));
+      tabPanes.forEach(p => p.classList.remove('active'));
+      
+      // Add active class to clicked tab and corresponding pane
+      this.classList.add('active');
+      document.querySelector(targetId).classList.add('active');
+    });
+  });
+});
+</script>
+{% endblock %}

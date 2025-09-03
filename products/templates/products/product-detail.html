@@ -32,13 +32,17 @@
                             <div class="quantity-selector mb-3">
                                 <label for="quantity" class="form-label">Quantity:</label>
                                 <div class="quantity-selector-product">
-                                    <button type="button" class="quantity-btn-product quantity-btn-minus" onclick="changeQuantity(-1, {{ product.stock }})">
+                                    <button type="button" class="quantity-btn-product quantity-btn-minus" 
+                                            onclick="changeQuantity(-1, {{ product.stock }}, event)"
+                                            data-max="{{ product.stock }}">
                                         <i class="fas fa-minus"></i>
                                     </button>
                                     <input type="number" name="quantity" id="quantity" 
                                            value="1" min="1" max="{{ product.stock }}" 
                                            class="quantity-input-product">
-                                    <button type="button" class="quantity-btn-product quantity-btn-plus" onclick="changeQuantity(1, {{ product.stock }})">
+                                    <button type="button" class="quantity-btn-product quantity-btn-plus" 
+                                            onclick="changeQuantity(1, {{ product.stock }}, event)"
+                                            data-max="{{ product.stock }}">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>

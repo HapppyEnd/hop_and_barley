@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Account | Hop & Barley{% endblock %}
+
+{% block content %}
+<main class="auth-page-wrapper">
+    <div class="auth-background">
+        <img src="{% static 'img/background/pattern.jpg' %}"
+             alt="Background pattern">
+    </div>
+    <div class="auth-form-container">
+        <div class="auth-container auth-container--register">
+            <div class="Legend">
+                <h1 class="auth-title">Edit Account Information</h1>
+            </div>
+
+
+            <form class="auth-form" id="account-edit-form" method="post">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="form-errors">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <div class="error-message">{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="InputField">
+                    <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {% for error in form.first_name.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="InputField">
+                    <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {% for error in form.last_name.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="InputField">
+                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    <small class="help-text">Email cannot be changed</small>
+                    {% for error in form.email.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="InputField">
+                    <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    <small class="help-text">Enter phone number in international format (e.g., +1234567890)</small>
+                    {% for error in form.phone.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="InputField">
+                    <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                    {{ form.city }}
+                    {% for error in form.city.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="InputField">
+                    <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                    {{ form.address }}
+                    {% for error in form.address.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="ButtonGroup">
+                    <button type="submit" class="button button--primary">
+                        Save Changes
+                    </button>
+                    <a href="{% url 'users:account' %}" class="button button--secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <p class="auth-switch">Back to <a href="{% url 'users:account' %}">My Account</a></p>
+        </div>
+    </div>
+</main>
+{% endblock %}

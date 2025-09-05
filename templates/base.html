@@ -57,7 +57,6 @@
         {% if user.is_authenticated %}
             <!-- Block for authorized user -->
             <div class="header__user-actions" id="auth-user">
-
                 <a href="{% url 'users:account' %}" class="user-icon" aria-label="My Account">
                     <img src="{% static 'img/icons/User_alt.svg' %}"
                          alt="User Account">
@@ -70,9 +69,9 @@
                         <span class="cart-count">{{ request.session.cart|length }}</span>
                     {% endif %}
                 </a>
-                <form action="{% url 'users:logout' %}" method="post">
+                <form action="{% url 'users:logout' %}" method="post" class="logout-form">
                     {% csrf_token %}
-                    <button type="submit" class="button button--secondary">
+                    <button type="submit" class="button button--secondary logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Sign out
                     </button>
                 </form>

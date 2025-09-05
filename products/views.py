@@ -5,6 +5,7 @@ from products.models import Category, Product, Review
 
 
 class ProductListView(ListView):
+    """View for displaying product list."""
     template_name = 'products/product-list.html'
     context_object_name = 'products'
     paginate_by = 3
@@ -54,6 +55,7 @@ class ProductListView(ListView):
 
 
 class ProductDetailView(DetailView):
+    """View for displaying product details."""
     model = Product
     template_name = 'products/product-detail.html'
     slug_field = 'slug'
@@ -68,7 +70,6 @@ class ProductDetailView(DetailView):
         context['reviews'] = Review.objects.filter(
             product=self.object).select_related('user')
         
-        # Добавляем информацию о корзине
         from orders.cart import Cart
         cart = Cart(self.request)
         context['cart_quantity'] = cart.get_product_quantity(self.object.id)

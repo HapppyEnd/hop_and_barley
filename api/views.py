@@ -6,6 +6,7 @@ from products.models import Product, Review
 
 
 class ProductViewSet(ModelViewSet):
+    """API viewset for products."""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = (DjangoFilterBackend,)

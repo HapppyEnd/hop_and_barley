@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -8,20 +9,15 @@ from products.models import Product
 
 
 class Order(models.Model):
-    """Модель заказа пользователя."""
-
-    STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('paid', 'Paid'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-        ('canceled', 'Canceled'),
-    )
+    """User order model."""
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             related_name='orders') 
-    status = models.CharField(choices=STATUS_CHOICES, default='pending',
-                              max_length=20)
+                             related_name='orders')
+    status = models.CharField(
+        choices=settings.ORDER_STATUS_CHOICES,
+        default=settings.ORDER_STATUS_PENDING,
+        max_length=20
+    )
     shipping_address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,13 +32,13 @@ class Order(models.Model):
 
     @property
     def total_price(self):
-        """Возвращает общую сумму заказа."""
+        """Return total order amount."""
         total = self.items.aggregate(total=Sum(
             F('price') * F('quantity')))['total'] or 0
         return f"${total}"
 
     def reduce_stock(self):
-        """Уменьшает остатки товаров при подтверждении заказа."""
+        """Reduce product stock when order is confirmed."""
         with transaction.atomic():
             for item in self.items.select_for_update().all():
                 product = item.product
@@ -55,16 +51,29 @@ class Order(models.Model):
                 product.save(update_fields=['stock'])
 
     def restore_stock(self):
-        """Восстанавливает остатки при отмене заказа."""
+        """Restore stock when order is canceled."""
         with transaction.atomic():
             for item in self.items.all():
                 product = item.product
                 product.stock += item.quantity
                 product.save(update_fields=['stock'])
 
+    def can_be_canceled(self):
+        """Check if order can be canceled."""
+        return self.status in settings.CANCELLABLE_STATUSES
+
+    def cancel_order(self):
+        """Cancel order and restore stock."""
+        if not self.can_be_canceled():
+            raise ValidationError("This order cannot be canceled")
+
+        self.status = settings.ORDER_STATUS_CANCELED
+        self.save()
+        self.restore_stock()
+
 
 class OrderItem(models.Model):
-    """Элемент заказа (товар с количеством и ценой)."""
+    """Order item (product with quantity and price)."""
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE,
                               related_name='items')
@@ -82,12 +91,12 @@ class OrderItem(models.Model):
         verbose_name_plural = 'Order Items'
 
     def save(self, *args, **kwargs):
-        """Сохраняет элемент заказа."""
+        """Save order item."""
         if not self.price:
             self.price = self.product.price
         super().save(*args, **kwargs)
 
     @property
     def total(self):
-        """Возвращает общую стоимость позиции (цена × количество)."""
+        """Return total item cost (price × quantity)."""
         return f"${self.price * self.quantity}"

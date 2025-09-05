@@ -4,6 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class User(AbstractUser):
+    """Custom user model."""
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username',]
     email = models.EmailField(unique=True)

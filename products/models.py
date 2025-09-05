@@ -7,6 +7,7 @@ from products.mixins import SlugMixin
 
 
 class JournalizedModel(models.Model):
+    """Base model with created_at and updated_at fields."""
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -16,6 +17,7 @@ class JournalizedModel(models.Model):
 
 
 class Category(JournalizedModel, SlugMixin):
+    """Product category model."""
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,
@@ -30,11 +32,13 @@ class Category(JournalizedModel, SlugMixin):
         return self.name
 
     def save(self, *args, **kwargs):
+        """Save category with unique slug."""
         self.generate_unique_slug(Category)
         super().save(*args, **kwargs)
 
 
 class Product(JournalizedModel, SlugMixin):
+    """Product model."""
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField()
@@ -55,22 +59,22 @@ class Product(JournalizedModel, SlugMixin):
         return self.name
 
     def save(self, *args, **kwargs):
+        """Save product with unique slug."""
         self.generate_unique_slug(Product)
         super().save(*args, **kwargs)
     
     @property
     def get_image_url(self):
-        """Возвращает URL изображения или изображение по умолчанию"""
+        """Return image URL or default image."""
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
         return '/static/img/products/default_product.png'
 
     def user_can_review(self, user):
-        """Проверяет, может ли пользователь оставить отзыв на товар."""
+        """Check if user can review this product."""
         if not user.is_authenticated:
             return False
         
-        # Проверяем, есть ли у пользователя заказы с этим товаром
         from orders.models import OrderItem
         return OrderItem.objects.filter(
             order__user=user,
@@ -80,6 +84,7 @@ class Product(JournalizedModel, SlugMixin):
 
 
 class Review(JournalizedModel):
+    """Product review model."""
     product = models.ForeignKey(Product, on_delete=models.CASCADE,
                                 related_name='reviews')
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
@@ -100,7 +105,7 @@ class Review(JournalizedModel):
         return f'{self.user.username}: {self.rating} - {self.comment}'
 
     def clean(self):
-        """Проверяет, что пользователь покупал товар."""
+        """Validate that user purchased the product."""
         super().clean()
         if not self.product.user_can_review(self.user):
             raise ValidationError(
@@ -108,6 +113,6 @@ class Review(JournalizedModel):
             )
 
     def save(self, *args, **kwargs):
-        """Проверяет валидность перед сохранением."""
+        """Validate before saving."""
         self.clean()
         super().save(*args, **kwargs)

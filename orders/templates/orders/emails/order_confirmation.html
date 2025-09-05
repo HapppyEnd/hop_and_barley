@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Hop & Barley</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #2c5530;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c5530;
+            margin-bottom: 10px;
+        }
+        .order-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .order-info h3 {
+            margin-top: 0;
+            color: #2c5530;
+        }
+        .order-details {
+            display: table;
+            width: 100%;
+        }
+        .order-details .row {
+            display: table-row;
+        }
+        .order-details .label {
+            display: table-cell;
+            font-weight: bold;
+            padding: 8px 0;
+            width: 40%;
+        }
+        .order-details .value {
+            display: table-cell;
+            padding: 8px 0;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .items-table th,
+        .items-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .items-table th {
+            background-color: #2c5530;
+            color: white;
+        }
+        .total-section {
+            background-color: #2c5530;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .shipping-info {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 14px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .status-paid {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-pending {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .status-shipped {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .status-delivered {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-canceled {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-placed {
+            background-color: #17a2b8;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">🍺 Hop & Barley</div>
+            <h1>Order Confirmation</h1>
+        </div>
+
+        <p>Dear {{ user_name }},</p>
+        
+        <p>Thank you for your order! We've received your order and are processing it.</p>
+
+        <div class="order-info">
+            <h3>Order Details</h3>
+            <div class="order-details">
+                <div class="row">
+                    <div class="label">Order Number:</div>
+                    <div class="value">#{{ order.id }}</div>
+                </div>
+                <div class="row">
+                    <div class="label">Order Date:</div>
+                    <div class="value">{{ order.created_at|date:"F d, Y" }}</div>
+                </div>
+                <div class="row">
+                    <div class="label">Status:</div>
+                    <div class="value">
+                        <span class="status-badge status-{{ order.status }}">
+                            {% if order.status == 'pending' %}
+                                <i class="fas fa-clock"></i> {{ order.get_status_display }}
+                            {% elif order.status == 'placed' %}
+                                <i class="fas fa-check-circle"></i> {{ order.get_status_display }}
+                            {% elif order.status == 'paid' %}
+                                <i class="fas fa-credit-card"></i> {{ order.get_status_display }}
+                            {% elif order.status == 'shipped' %}
+                                <i class="fas fa-shipping-fast"></i> {{ order.get_status_display }}
+                            {% elif order.status == 'delivered' %}
+                                <i class="fas fa-check-double"></i> {{ order.get_status_display }}
+                            {% elif order.status == 'canceled' %}
+                                <i class="fas fa-times-circle"></i> {{ order.get_status_display }}
+                            {% else %}
+                                <i class="fas fa-circle"></i> {{ order.get_status_display }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="label">Payment Method:</div>
+                    <div class="value">{{ payment_display }}</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Items Ordered</h3>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.price }}</td>
+                    <td>${{ item.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total-section">
+            Total: ${{ order.total_price }}
+        </div>
+
+        <div class="shipping-info">
+            <h4>Shipping Address</h4>
+            <p>{{ order.shipping_address|linebreaks }}</p>
+        </div>
+
+        {% if order.status == 'pending' %}
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <strong>Payment Information:</strong><br>
+            You will pay {{ payment_display }} when you receive your order. 
+            The order will be processed once payment is received.
+        </div>
+        {% endif %}
+
+        <p>We'll send you another email when your order ships. If you have any questions, please don't hesitate to contact us.</p>
+
+        <div class="footer">
+            <p><strong>Best regards,<br>The Hop & Barley Team</strong></p>
+            <p>© 2025 Hop & Barley. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

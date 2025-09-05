@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -16,6 +17,7 @@ from users.forms import (CustomPasswordChangeForm, EmailLoginForm,
 
 
 class UserLoginView(LoginView):
+    """User login view."""
     template_name = 'users/login.html'
     form_class = EmailLoginForm
 
@@ -46,6 +48,7 @@ class UserLoginView(LoginView):
 
 
 class RegisterView(CreateView):
+    """User registration view."""
     form_class = UserRegisterForm
     template_name = 'users/register.html'
     success_url = reverse_lazy('users:login')
@@ -62,6 +65,7 @@ class RegisterView(CreateView):
 
 
 class UserLogoutView(LogoutView):
+    """User logout view."""
     def dispatch(self, request, *args, **kwargs):
         messages.success(request, 'Successfully logged out!')
         return super().dispatch(request, *args, **kwargs)
@@ -94,7 +98,7 @@ class AccountView(TemplateView):
             'orders': page_obj,
             'status_filter': status_filter,
             'search_query': search_query,
-            'status_choices': Order.STATUS_CHOICES,
+            'status_choices': settings.ORDER_STATUS_CHOICES,
         })
 
         return context

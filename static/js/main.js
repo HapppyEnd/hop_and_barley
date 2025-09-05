@@ -49,26 +49,6 @@ window.updateQuantityDirect = function(input, maxStock) {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- General logic for all pages (Login/Logout Simulation) ---
-    const loginForm = document.getElementById('login-form');
-    const logoutButton = document.getElementById('logout-button');
-
-    function checkLoginStatus() {
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            document.body.classList.add('user-logged-in');
-        } else {
-            document.body.classList.remove('user-logged-in');
-        }
-    }
-
-    if (logoutButton) {
-        logoutButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('isLoggedIn');
-            window.location.href = 'home.html';
-        });
-    }
-    checkLoginStatus();
 
     // --- Logic for Product List Page (Filtering, Sorting, Search) ---
     const homePageContent = document.querySelector('.main-content-grid');

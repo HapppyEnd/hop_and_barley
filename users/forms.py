@@ -8,6 +8,7 @@ User = get_user_model()
 
 
 class EmailLoginForm(AuthenticationForm):
+    """Login form using email."""
     username = forms.EmailField(label='Email Address',
                                 widget=forms.EmailInput(
                                     attrs={'class': 'input',
@@ -18,6 +19,7 @@ class EmailLoginForm(AuthenticationForm):
 
 
 class UserRegisterForm(UserCreationForm):
+    """User registration form."""
     email = forms.EmailField(
         label='Email Address',
         widget=forms.EmailInput(
@@ -43,12 +45,14 @@ class UserRegisterForm(UserCreationForm):
         fields = ('email', 'username', 'first_name', 'last_name', 'phone',)
 
     def clean_email(self):
+        """Validate email uniqueness."""
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email=email).exists():
             raise forms.ValidationError('Email already registered')
         return email
 
     def clean_phone(self):
+        """Validate phone number."""
         phone = self.cleaned_data.get('phone')
         return phone
 

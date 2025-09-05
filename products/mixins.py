@@ -6,6 +6,7 @@ class SlugMixin:
 
     def generate_unique_slug(self, model_class, slug_field='slug',
                              text_field='name'):
+        """Generate unique slug for model."""
         if not getattr(self, slug_field):
             slug = slugify(getattr(self, text_field))
             original_slug = slug

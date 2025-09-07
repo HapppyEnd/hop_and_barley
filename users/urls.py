@@ -2,7 +2,7 @@ from django.urls import path
 
 from users.views import (AccountView, PasswordChangeView, ProfileUpdateView,
                          RegisterView, UserLoginView, UserLogoutView,
-                         forgot_password)
+                         forgot_password, reset_password)
 
 app_name = 'users'
 urlpatterns = [
@@ -15,4 +15,5 @@ urlpatterns = [
          name='password_change'),
 
     path('forgot-password/', forgot_password, name='forgot_password'),
+    path('reset-password/', reset_password, name='reset_password'),
 ]

@@ -66,16 +66,20 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'UserAttributeSimilarityValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'MinimumLengthValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'CommonPasswordValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'NumericPasswordValidator'),
     },
 ]
 
@@ -118,3 +122,137 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 # Cart settings
 CART_SESSION_ID = 'cart'
+
+# Email settings for development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = 'noreply@hopandbarley.com'
+
+# Email templates
+PASSWORD_RESET_EMAIL_SUBJECT = 'Password Reset - Hop & Barley'
+PASSWORD_RESET_EMAIL_TEMPLATE = """
+Hello {user_name},
+
+You requested a password reset for your Hop & Barley account.
+
+To reset your password, please click the following link:
+{reset_url}
+
+This link will be valid for 1 hour.
+
+If you did not request this password reset, please ignore this email.
+
+Best regards,
+Hop & Barley Team
+"""
+
+# Messages
+MESSAGES = {
+    # Login messages
+    'login_success': 'Successfully logged in!',
+    'login_error': 'Invalid email or password. Please try again.',
+    'logout_success': 'Successfully logged out!',
+
+    # Profile messages
+    'profile_updated': 'Profile updated successfully!',
+    'profile_errors': 'Please correct the errors below.',
+
+    # Password change messages
+    'password_changed': 'Password changed successfully!',
+    'password_errors': 'Please correct the errors below.',
+
+    # Password reset messages
+    'password_reset_sent': ('Password reset instructions have been sent to '
+                            'your email.'),
+    'password_reset_email_failed': ('Failed to send email. Please try again '
+                                    'later.'),
+    'password_reset_sent_generic': ('If an account with this email exists, '
+                                    'password reset instructions have been '
+                                    'sent.'),
+    'password_reset_no_session': ('No password reset session found. Please '
+                                  'request a new password reset.'),
+    'password_reset_expired': ('Password reset session has expired. Please '
+                               'request a new password reset.'),
+    'password_reset_invalid_session': 'Invalid reset session.',
+    'password_reset_success': ('Your password has been reset successfully. '
+                               'You can now log in with your new password.'),
+}
+
+# Console logging templates
+CONSOLE_LOGS = {
+    'password_reset_email_sent': """
+==================================================
+PASSWORD RESET EMAIL SENT
+==================================================
+To: {email}
+Subject: {subject}
+Reset URL: {reset_url}
+User: {username} (ID: {user_id})
+Session stored for user ID: {user_id}
+Reset valid until: {valid_until}
+==================================================
+""",
+    'password_reset_email_failed': """
+==================================================
+EMAIL SENDING FAILED
+==================================================
+Error: {error}
+To: {email}
+==================================================
+""",
+    'password_reset_user_not_found': """
+==================================================
+PASSWORD RESET REQUEST - USER NOT FOUND
+==================================================
+Email: {email}
+Note: User not found in database
+==================================================
+""",
+    'password_reset_no_session': """
+==================================================
+PASSWORD RESET - NO SESSION DATA
+==================================================
+No valid reset session found
+==================================================
+""",
+    'password_reset_session_expired': """
+==================================================
+PASSWORD RESET - SESSION EXPIRED
+==================================================
+Session timestamp: {session_time}
+Current time: {current_time}
+Time difference: {time_diff:.1f} minutes
+==================================================
+""",
+    'password_reset_attempt': """
+==================================================
+PASSWORD RESET ATTEMPT
+==================================================
+User: {username} (ID: {user_id})
+Email: {email}
+Session valid until: {valid_until}
+==================================================
+""",
+    'password_reset_user_not_found_session': """
+==================================================
+PASSWORD RESET - USER NOT FOUND
+==================================================
+User ID: {user_id}
+Email: {email}
+==================================================
+""",
+    'password_reset_successful': """
+==================================================
+PASSWORD RESET SUCCESSFUL
+==================================================
+User: {username} (ID: {user_id})
+Email: {email}
+Password updated successfully
+Reset session cleared
+==================================================
+""",
+}

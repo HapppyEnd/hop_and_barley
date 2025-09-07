@@ -21,7 +21,7 @@ class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(
         label='Email Address',
         widget=forms.EmailInput(
-            attrs={'class': 'input', 'placeholder': 'Enter your email'}),)
+            attrs={'class': 'input', 'placeholder': 'Enter your email'}), )
     username = forms.CharField(label='Username', widget=forms.TextInput(
         attrs={'class': 'input', 'placeholder': 'enter your username'}))
     phone = PhoneNumberField(
@@ -108,6 +108,7 @@ class UserProfileForm(forms.ModelForm):
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     """Custom password change form with better styling."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['old_password'].widget.attrs.update({
@@ -135,3 +136,33 @@ class ForgotPasswordForm(forms.Form):
             attrs={'class': 'Input', 'placeholder': 'Enter your email address'}
         )
     )
+
+
+class ResetPasswordForm(forms.Form):
+    """Form for password reset with new password."""
+    new_password1 = forms.CharField(
+        label='New Password',
+        widget=forms.PasswordInput(
+            attrs={'class': 'Input', 'placeholder': 'Enter new password'}
+        )
+    )
+    new_password2 = forms.CharField(
+        label='Confirm New Password',
+        widget=forms.PasswordInput(
+            attrs={'class': 'Input', 'placeholder': 'Confirm new password'}
+        )
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password1 = cleaned_data.get('new_password1')
+        new_password2 = cleaned_data.get('new_password2')
+
+        if new_password1 and new_password2:
+            if new_password1 != new_password2:
+                raise forms.ValidationError("Passwords don't match.")
+            if len(new_password1) < 8:
+                raise forms.ValidationError(
+                    "Password must be at least 8 characters long.")
+
+        return cleaned_data

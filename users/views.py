@@ -1,18 +1,33 @@
+from datetime import datetime, timedelta
+from typing import cast
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, TemplateView, UpdateView
 
 from orders.models import Order
 from users.forms import (CustomPasswordChangeForm, EmailLoginForm,
-                         ForgotPasswordForm, UserProfileForm, UserRegisterForm)
+                         ForgotPasswordForm, ResetPasswordForm,
+                         UserProfileForm, UserRegisterForm)
+from users.models import User
+
+
+def log_to_console(template_key, **kwargs):
+    """Helper function to log formatted messages to console."""
+    if template_key in settings.CONSOLE_LOGS:
+        template = settings.CONSOLE_LOGS[template_key]
+        print(template.format(**kwargs))
 
 
 class UserLoginView(LoginView):
@@ -35,13 +50,12 @@ class UserLoginView(LoginView):
         else:
             self.request.session.set_expiry(None)
         self.request.session.modified = True
-        messages.success(self.request, 'Successfully logged in!')
+        messages.success(self.request, settings.MESSAGES['login_success'])
 
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request,
-                       'Invalid email or password. Please try again.')
+        messages.error(self.request, settings.MESSAGES['login_error'])
         return super().form_invalid(form)
 
 
@@ -63,7 +77,7 @@ class RegisterView(CreateView):
 
 class UserLogoutView(LogoutView):
     def dispatch(self, request, *args, **kwargs):
-        messages.success(request, 'Successfully logged out!')
+        messages.success(request, settings.MESSAGES['logout_success'])
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -108,15 +122,15 @@ class ProfileUpdateView(UpdateView):
     template_name = 'users/account_edit.html'
     success_url = reverse_lazy('users:account')
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return self.request.user
 
     def form_valid(self, form):
-        messages.success(self.request, 'Profile updated successfully!')
+        messages.success(self.request, settings.MESSAGES['profile_updated'])
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, 'Please correct the errors below.')
+        messages.error(self.request, settings.MESSAGES['profile_errors'])
         return super().form_invalid(form)
 
 
@@ -128,11 +142,11 @@ class PasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy('users:account')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Password changed successfully!')
+        messages.success(self.request, settings.MESSAGES['password_changed'])
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, 'Please correct the errors below.')
+        messages.error(self.request, settings.MESSAGES['password_errors'])
         return super().form_invalid(form)
 
 
@@ -142,12 +156,159 @@ def forgot_password(request):
     if request.method == 'POST':
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
-            messages.success(
-                request,
-                'Password reset instructions have been sent to your email.'
-            )
+            email = form.cleaned_data['email']
+
+            # Check if user exists
+            user_model = get_user_model()
+            try:
+                user = cast(User, user_model.objects.get(email=email))
+
+                # Store reset info in session
+                request.session['password_reset_user_id'] = user.id
+                request.session['password_reset_email'] = user.email
+                request.session[
+                    'password_reset_timestamp'] = timezone.now().timestamp()
+
+                reset_url = (f"{request.build_absolute_uri('/')}"
+                             f"users/reset-password/")
+
+                # Email content
+                subject = settings.PASSWORD_RESET_EMAIL_SUBJECT
+                message = settings.PASSWORD_RESET_EMAIL_TEMPLATE.format(
+                    user_name=user.first_name or user.username,
+                    reset_url=reset_url
+                )
+
+                # Send email
+                try:
+                    send_mail(
+                        subject,
+                        message,
+                        settings.DEFAULT_FROM_EMAIL,
+                        [email],
+                        fail_silently=False,
+                    )
+
+                    # Log to console
+                    log_to_console('password_reset_email_sent',
+                                   email=email,
+                                   subject=subject,
+                                   reset_url=reset_url,
+                                   username=user.username,
+                                   user_id=user.id,
+                                   valid_until=timezone.now() +
+                                   timedelta(hours=1))
+
+                    messages.success(
+                        request,
+                        settings.MESSAGES['password_reset_sent']
+                    )
+
+                except Exception as e:
+                    log_to_console('password_reset_email_failed',
+                                   error=str(e),
+                                   email=email)
+
+                    messages.error(
+                        request,
+                        settings.MESSAGES['password_reset_email_failed']
+                    )
+
+            except user_model.DoesNotExist:
+                # Don't reveal if email exists or not for security
+                log_to_console('password_reset_user_not_found',
+                               email=email)
+
+                messages.success(
+                    request,
+                    settings.MESSAGES['password_reset_sent_generic']
+                )
+
             return redirect('users:login')
     else:
         form = ForgotPasswordForm()
 
     return render(request, 'users/forgot_password.html', {'form': form})
+
+
+@require_http_methods(["GET", "POST"])
+def reset_password(request):
+    """View for handling password reset with session."""
+    # Check if reset session exists
+    user_id = request.session.get('password_reset_user_id')
+    reset_email = request.session.get('password_reset_email')
+    reset_timestamp = request.session.get('password_reset_timestamp')
+
+    if not all([user_id, reset_email, reset_timestamp]):
+        log_to_console('password_reset_no_session')
+
+        messages.error(request, settings.MESSAGES['password_reset_no_session'])
+        return redirect('users:forgot_password')
+
+    # Check if reset session is not expired (1 hour)
+    current_time = timezone.now().timestamp()
+    if current_time - reset_timestamp > 3600:  # 1 hour = 3600 seconds
+        log_to_console('password_reset_session_expired',
+                       session_time=datetime.fromtimestamp(reset_timestamp),
+                       current_time=timezone.now(),
+                       time_diff=(current_time - reset_timestamp) / 60)
+
+        # Clear expired session
+        request.session.pop('password_reset_user_id', None)
+        request.session.pop('password_reset_email', None)
+        request.session.pop('password_reset_timestamp', None)
+
+        messages.error(request, settings.MESSAGES['password_reset_expired'])
+        return redirect('users:forgot_password')
+
+    # Get user
+    user_model = get_user_model()
+    try:
+        user = cast(User, user_model.objects.get(
+            id=user_id, email=reset_email))
+
+        log_to_console('password_reset_attempt',
+                       username=user.username,
+                       user_id=user.id,
+                       email=user.email,
+                       valid_until=datetime.fromtimestamp(
+                           reset_timestamp + 3600))
+
+    except user_model.DoesNotExist:
+        log_to_console('password_reset_user_not_found_session',
+                       user_id=user_id,
+                       email=reset_email)
+
+        messages.error(request,
+                       settings.MESSAGES['password_reset_invalid_session'])
+        return redirect('users:forgot_password')
+
+    if request.method == 'POST':
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password1']
+
+            # Update user password
+            user.set_password(new_password)
+            user.save()
+
+            # Clear reset session
+            request.session.pop('password_reset_user_id', None)
+            request.session.pop('password_reset_email', None)
+            request.session.pop('password_reset_timestamp', None)
+
+            log_to_console('password_reset_successful',
+                           username=user.username,
+                           user_id=user.id,
+                           email=user.email)
+
+            messages.success(request,
+                             settings.MESSAGES['password_reset_success'])
+            return redirect('users:login')
+    else:
+        form = ResetPasswordForm()
+
+    return render(request, 'users/reset_password.html', {
+        'form': form,
+        'user': user
+    })

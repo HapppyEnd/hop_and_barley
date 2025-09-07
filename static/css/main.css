@@ -3506,6 +3506,22 @@ body.user-logged-in .header__user-actions {
     box-shadow: 0 0 0 2px rgba(2, 84, 45, 0.1);
 }
 
+.form-group input.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+}
+
+.form-group .error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.form-group input.error + .error-message {
+    display: block;
+}
+
 .payment-note {
     display: flex;
     align-items: center;

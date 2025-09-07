@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
@@ -187,8 +188,21 @@ def checkout(request):
             create_order_items_from_cart(order, cart)
 
             card_details = get_card_details(request, payment_method)
-            payment_success = process_payment(payment_method, order,
-                                              card_details)
+
+            if payment_method == 'card' and card_details:
+                expiry_date = card_details.get('expiry_date', '').strip()
+                if expiry_date and not validate_card_expiry(expiry_date):
+                    order.delete()
+                    messages.error(
+                        request, settings.ORDER_MESSAGES['CARD_EXPIRED']
+                    )
+                    return render(request, 'orders/checkout.html', {
+                        'cart': cart,
+                        'user': request.user
+                    })
+            payment_success = process_payment(
+                payment_method, order, card_details
+            )
 
             if payment_success:
                 order.status = (
@@ -222,6 +236,22 @@ def checkout(request):
         'cart': cart,
         'user': request.user
     })
+
+
+def validate_card_expiry(expiry_date):
+    """Validate that the card is not expired."""
+    try:
+        month, year = expiry_date.split('/')
+        month = int(month)
+        year = int('20' + year)
+
+        now = datetime.now()
+        card_date = datetime(year, month, 1)
+        current_date = datetime(now.year, now.month, 1)
+
+        return card_date >= current_date
+    except (ValueError, TypeError, IndexError):
+        return False
 
 
 def get_card_details(request, payment_method):
@@ -339,9 +369,12 @@ def process_payment(payment_method, order, card_details=None):
             return False
         if not card_holder or len(card_holder) < 2:
             return False
-        if not expiry_date or not expiry_date.count('/') == 1:
+        if not expiry_date or len(expiry_date) != 5:
             return False
         if not cvv or len(cvv) < 3:
+            return False
+
+        if not validate_card_expiry(expiry_date):
             return False
 
         if card_number.startswith('4000'):
@@ -403,74 +436,83 @@ def send_admin_order_notification(order, user_name, payment_display):
 def build_customer_email_text(order, user_name, payment_display):
     """Build customer email text content."""
     items_text = build_items_text(order)
+    email_templates = settings.EMAIL_TEMPLATES
 
     return f"""
-Dear {user_name},
+{email_templates['CUSTOMER_GREETING'].format(user_name=user_name)}
 
-Thank you for your order! We've received your order and are processing it.
+{email_templates['CUSTOMER_THANK_YOU']}
 
-Order Details:
-- Order Number: #{order.id}
-- Order Date: {order.created_at.strftime('%B %d, %Y')}
-- Status: {order.get_status_display()}
-- Payment Method: {payment_display}
+{email_templates['ORDER_DETAILS_HEADER']}
+- {email_templates['ORDER_NUMBER'].format(order_id=order.id)}
+- {email_templates['ORDER_DATE'].format(
+        date=order.created_at.strftime('%B %d, %Y')
+    )}
+- {email_templates['ORDER_STATUS'].format(status=order.get_status_display())}
+- {email_templates['PAYMENT_METHOD'].format(payment=payment_display)}
 
-Items Ordered:
+{email_templates['ITEMS_ORDERED_HEADER']}
 {items_text}
 
-Total: {order.total_price}
+{email_templates['TOTAL_HEADER'].format(total=order.total_price)}
 
-Shipping Address:
+{email_templates['SHIPPING_ADDRESS_HEADER']}
 {order.shipping_address}
 
-We'll send you another email when your order ships.
-If you have any questions, please don't hesitate to contact us.
+{email_templates['CUSTOMER_FOOTER']}
 
-Best regards,
-The Hop & Barley Team
+{email_templates['BEST_REGARDS']}
+{email_templates['TEAM_SIGNATURE']}
 
-© 2025 Hop & Barley. All rights reserved.
+{email_templates['COPYRIGHT']}
 """
 
 
 def build_admin_email_text(order, user_name, payment_display):
     """Build admin email text content."""
     items_text = build_items_text(order)
+    email_templates = settings.EMAIL_TEMPLATES
 
     return f"""
-New Order Alert!
+{email_templates['ADMIN_ALERT_HEADER']}
 
-A new order has been placed and requires your attention.
+{email_templates['ADMIN_ALERT_MESSAGE']}
 
-Customer Information:
-- Name: {user_name}
-- Email: {order.user.email}
-- Order Date: {order.created_at.strftime('%B %d, %Y %H:%M')}
-- Payment Method: {payment_display}
+{email_templates['CUSTOMER_INFO_HEADER']}
+- {email_templates['CUSTOMER_NAME'].format(name=user_name)}
+- {email_templates['CUSTOMER_EMAIL'].format(email=order.user.email)}
+- {email_templates['ORDER_DATE_TIME'].format(
+        date=order.created_at.strftime('%B %d, %Y %H:%M')
+    )}
+- {email_templates['PAYMENT_METHOD'].format(payment=payment_display)}
 
-Order Details:
-- Order Number: #{order.id}
-- Status: {order.get_status_display()}
+{email_templates['ORDER_DETAILS_HEADER']}
+- {email_templates['ORDER_NUMBER'].format(order_id=order.id)}
+- {email_templates['ORDER_STATUS'].format(status=order.get_status_display())}
 
-Items Ordered:
+{email_templates['ITEMS_ORDERED_HEADER']}
 {items_text}
 
-Total: {order.total_price}
+{email_templates['TOTAL_HEADER'].format(total=order.total_price)}
 
-Shipping Address:
+{email_templates['SHIPPING_ADDRESS_HEADER']}
 {order.shipping_address}
 
-Action Required: Please process this order and update the status accordingly.
+{email_templates['ADMIN_ACTION_REQUIRED']}
 """
 
 
 def build_items_text(order):
     """Build items text for email content."""
     items_text = ""
+    item_format = settings.EMAIL_TEMPLATES['ITEM_FORMAT']
     for item in order.items.all():
-        items_text += (
-            f"- {item.product.name} × {item.quantity} - {item.total}\n"
+        formatted_item = item_format.format(
+            name=item.product.name,
+            quantity=item.quantity,
+            total=item.total
         )
+        items_text += f"{formatted_item}\n"
     return items_text
 
 
@@ -482,7 +524,9 @@ def send_status_change_notification(order, old_status, new_status):
     new_status_display = get_status_display_name(new_status)
     user_name = order.user.get_full_name() or order.user.username
 
-    customer_subject = f'Order Status Update #{order.id} - Hop & Barley'
+    customer_subject = settings.EMAIL_TEMPLATES[
+        'STATUS_UPDATE_SUBJECT'
+    ].format(order_id=order.id)
     customer_html = render_to_string(
         'orders/emails/order_status_update.html', {
             'order': order,
@@ -511,34 +555,35 @@ def build_status_change_email_text(order, user_name, old_status_display,
     """Build status change email text content."""
     items_text = build_items_text(order)
     status_message = get_status_change_message(new_status)
+    email_templates = settings.EMAIL_TEMPLATES
 
     return f"""
-Dear {user_name},
+{email_templates['STATUS_UPDATE_GREETING'].format(user_name=user_name)}
 
-Your order status has been updated.
+{email_templates['STATUS_UPDATE_HEADER']}
 
-Order Details:
-- Order Number: #{order.id}
+{email_templates['ORDER_DETAILS_HEADER']}
+- {email_templates['ORDER_NUMBER'].format(order_id=order.id)}
 - Previous Status: {old_status_display}
 - New Status: {new_status_display}
 - Updated Date: {order.updated_at.strftime('%B %d, %Y %H:%M')}
 
-Items Ordered:
+{email_templates['ITEMS_ORDERED_HEADER']}
 {items_text}
 
-Total: {order.total_price}
+{email_templates['TOTAL_HEADER'].format(total=order.total_price)}
 
-Shipping Address:
+{email_templates['SHIPPING_ADDRESS_HEADER']}
 {order.shipping_address}
 
 {status_message}
 
-If you have any questions, please don't hesitate to contact us.
+{email_templates['CUSTOMER_FOOTER']}
 
-Best regards,
-The Hop & Barley Team
+{email_templates['BEST_REGARDS']}
+{email_templates['TEAM_SIGNATURE']}
 
-© 2025 Hop & Barley. All rights reserved.
+{email_templates['COPYRIGHT']}
 """
 
 

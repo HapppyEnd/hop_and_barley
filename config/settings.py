@@ -178,6 +178,15 @@ ORDER_MESSAGES = {
     'PAYMENT_FAILED': (
         'Payment failed. Please try again with a different payment method.'
     ),
+    'CARD_EXPIRED': 'Your card has expired. Please use a valid card.',
+    'CARD_INVALID_FORMAT': 'Please enter expiry date in MM/YY format.',
+    'CARD_INVALID_MONTH': 'Please enter a valid month (01-12).',
+    'CARD_INVALID_YEAR': 'Please enter a valid year.',
+    'CARD_NUMBER_INVALID': 'Please enter a valid card number.',
+    'CARD_HOLDER_INVALID': 'Please enter cardholder name.',
+    'CARD_CVV_INVALID': 'Please enter a valid CVV.',
+    'CARD_DETAILS_REQUIRED': 'Please fill in all card details.',
+    'CARD_NUMBER_LENGTH': 'Please enter a valid card number.',
     'ORDER_ERROR': 'Error placing order: {error}',
     'SHIPPING_ADDRESS_REQUIRED': 'Please provide shipping address',
     'ORDER_CANNOT_BE_CANCELED': 'This order cannot be canceled.',
@@ -192,6 +201,54 @@ ORDER_MESSAGES = {
         'Order successfully placed and paid! '
         'Check your email for confirmation.'
     ),
+}
+
+# Email templates
+EMAIL_TEMPLATES = {
+    'CUSTOMER_GREETING': 'Dear {user_name},',
+    'CUSTOMER_THANK_YOU': (
+        'Thank you for your order! We\'ve received your order and are '
+        'processing it.'
+    ),
+    'ORDER_DETAILS_HEADER': 'Order Details:',
+    'ORDER_NUMBER': 'Order Number: #{order_id}',
+    'ORDER_DATE': 'Order Date: {date}',
+    'ORDER_STATUS': 'Status: {status}',
+    'PAYMENT_METHOD': 'Payment Method: {payment}',
+    'ITEMS_ORDERED_HEADER': 'Items Ordered:',
+    'TOTAL_HEADER': 'Total: {total}',
+    'SHIPPING_ADDRESS_HEADER': 'Shipping Address:',
+    'CUSTOMER_FOOTER': (
+        'We\'ll send you another email when your order ships.\n'
+        'If you have any questions, please don\'t hesitate to contact us.'
+    ),
+    'BEST_REGARDS': 'Best regards,',
+    'TEAM_SIGNATURE': 'The Hop & Barley Team',
+    'COPYRIGHT': '© 2025 Hop & Barley. All rights reserved.',
+
+    'ADMIN_ALERT_HEADER': 'New Order Alert!',
+    'ADMIN_ALERT_MESSAGE': (
+        'A new order has been placed and requires your attention.'
+    ),
+    'CUSTOMER_INFO_HEADER': 'Customer Information:',
+    'CUSTOMER_NAME': 'Name: {name}',
+    'CUSTOMER_EMAIL': 'Email: {email}',
+    'ORDER_DATE_TIME': 'Order Date: {date}',
+    'ADMIN_ACTION_REQUIRED': (
+        'Action Required: Please process this order and update the status '
+        'accordingly.'
+    ),
+
+    'ITEM_FORMAT': '- {name} × {quantity} - {total}',
+
+    'STATUS_UPDATE_SUBJECT': 'Order Status Update #{order_id} - Hop & Barley',
+    'STATUS_UPDATE_GREETING': 'Dear {user_name},',
+    'STATUS_UPDATE_HEADER': 'Your order status has been updated!',
+    'STATUS_UPDATE_DETAILS': (
+        'Order #{order_id} status changed from {old_status} to {new_status}.'
+    ),
+    'STATUS_UPDATE_MESSAGE': 'We\'ll keep you updated on your order progress.',
+    'STATUS_UPDATE_FOOTER': 'Thank you for choosing Hop & Barley!',
 }
 
 # Status change messages
@@ -218,9 +275,10 @@ STATUS_CHANGE_MESSAGES = {
 }
 
 # Email settings
-EMAIL_BACKEND = (
-    'django.core.mail.backends.console.EmailBackend'  # For development
-)
+# For development, use file backend to save emails to files
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+
 # For production, uncomment and configure:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.gmail.com'  # or another SMTP server
@@ -228,5 +286,132 @@ EMAIL_BACKEND = (
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = 'your-email@gmail.com'
 # EMAIL_HOST_PASSWORD = 'your-app-password'
-# DEFAULT_FROM_EMAIL = 'noreply@hopandbarley.com'
-# ADMIN_EMAIL = 'admin@hopandbarley.com'
+
+# Email configuration
+DEFAULT_FROM_EMAIL = 'noreply@hopandbarley.com'
+ADMIN_EMAIL = 'admin@hopandbarley.com'
+
+# Email templates
+PASSWORD_RESET_EMAIL_SUBJECT = 'Password Reset - Hop & Barley'
+PASSWORD_RESET_EMAIL_TEMPLATE = """
+Hello {user_name},
+
+You requested a password reset for your Hop & Barley account.
+
+To reset your password, please click the following link:
+{reset_url}
+
+This link will be valid for 1 hour.
+
+If you did not request this password reset, please ignore this email.
+
+Best regards,
+Hop & Barley Team
+"""
+
+# Messages
+MESSAGES = {
+    # Login messages
+    'login_success': 'Successfully logged in!',
+    'login_error': 'Invalid email or password. Please try again.',
+    'logout_success': 'Successfully logged out!',
+
+    # Profile messages
+    'profile_updated': 'Profile updated successfully!',
+    'profile_errors': 'Please correct the errors below.',
+
+    # Password change messages
+    'password_changed': 'Password changed successfully!',
+    'password_errors': 'Please correct the errors below.',
+
+    # Password reset messages
+    'password_reset_sent': ('Password reset instructions have been sent to '
+                            'your email.'),
+    'password_reset_email_failed': ('Failed to send email. Please try again '
+                                    'later.'),
+    'password_reset_sent_generic': ('If an account with this email exists, '
+                                    'password reset instructions have been '
+                                    'sent.'),
+    'password_reset_no_session': ('No password reset session found. Please '
+                                  'request a new password reset.'),
+    'password_reset_expired': ('Password reset session has expired. Please '
+                               'request a new password reset.'),
+    'password_reset_invalid_session': 'Invalid reset session.',
+    'password_reset_success': ('Your password has been reset successfully. '
+                               'You can now log in with your new password.'),
+}
+
+# Console logging templates
+CONSOLE_LOGS = {
+    'password_reset_email_sent': """
+==================================================
+PASSWORD RESET EMAIL SENT
+==================================================
+To: {email}
+Subject: {subject}
+Reset URL: {reset_url}
+User: {username} (ID: {user_id})
+Session stored for user ID: {user_id}
+Reset valid until: {valid_until}
+==================================================
+""",
+    'password_reset_email_failed': """
+==================================================
+EMAIL SENDING FAILED
+==================================================
+Error: {error}
+To: {email}
+==================================================
+""",
+    'password_reset_user_not_found': """
+==================================================
+PASSWORD RESET REQUEST - USER NOT FOUND
+==================================================
+Email: {email}
+Note: User not found in database
+==================================================
+""",
+    'password_reset_no_session': """
+==================================================
+PASSWORD RESET - NO SESSION DATA
+==================================================
+No valid reset session found
+==================================================
+""",
+    'password_reset_session_expired': """
+==================================================
+PASSWORD RESET - SESSION EXPIRED
+==================================================
+Session timestamp: {session_time}
+Current time: {current_time}
+Time difference: {time_diff:.1f} minutes
+==================================================
+""",
+    'password_reset_attempt': """
+==================================================
+PASSWORD RESET ATTEMPT
+==================================================
+User: {username} (ID: {user_id})
+Email: {email}
+Session valid until: {valid_until}
+==================================================
+""",
+    'password_reset_user_not_found_session': """
+==================================================
+PASSWORD RESET - USER NOT FOUND
+==================================================
+User ID: {user_id}
+Email: {email}
+==================================================
+""",
+    'password_reset_successful': """
+==================================================
+PASSWORD RESET SUCCESSFUL
+==================================================
+User: {username} (ID: {user_id})
+Email: {email}
+Password updated successfully
+Reset session cleared
+==================================================
+""",
+}

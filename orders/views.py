@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-from django.http import JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
@@ -18,8 +18,23 @@ from orders.models import Order, OrderItem
 from products.models import Product
 
 
-def get_cart_response(cart, success=True, message="", total_price=None):
-    """Create consistent cart responses."""
+def get_cart_response(
+    cart: Cart,
+    success: bool = True,
+    message: str = "",
+    total_price: Decimal | None = None
+) -> dict[str, any]:
+    """Create consistent cart responses.
+
+    Args:
+        cart: Cart instance
+        success: Whether the operation was successful
+        message: Optional success/error message
+        total_price: Optional total price to include in response
+
+    Returns:
+        Dictionary with cart response data
+    """
     response_data = {
         'success': success,
         'cart_count': len(cart),
@@ -33,9 +48,23 @@ def get_cart_response(cart, success=True, message="", total_price=None):
     return response_data
 
 
-def handle_cart_operation(request, operation_func, success_message,
-                          error_message="Invalid operation"):
-    """Handle common cart operations with consistent responses."""
+def handle_cart_operation(
+    request: HttpRequest,
+    operation_func: callable,
+    success_message: str,
+    error_message: str = "Invalid operation"
+) -> JsonResponse | HttpResponse:
+    """Handle common cart operations with consistent responses.
+
+    Args:
+        request: HTTP request object
+        operation_func: Function to execute the cart operation
+        success_message: Message to show on success
+        error_message: Message to show on error
+
+    Returns:
+        JsonResponse for AJAX requests, HttpResponse redirect otherwise
+    """
     cart = Cart(request)
     product_id = (request.POST.get('product_id') or
                   request.resolver_match.kwargs.get('product_id'))
@@ -45,7 +74,7 @@ def handle_cart_operation(request, operation_func, success_message,
         operation_func(cart, product, request)
         messages.success(request, success_message)
         response_data = get_cart_response(cart, message=success_message)
-    except Exception:
+    except (ValueError, TypeError, ValidationError):
         messages.error(request, error_message)
         response_data = get_cart_response(cart, success=False,
                                           message=error_message)
@@ -56,13 +85,26 @@ def handle_cart_operation(request, operation_func, success_message,
     return redirect('orders:cart_detail')
 
 
-def validate_quantity(quantity, product):
-    """Validate quantity against product stock."""
+def validate_quantity(quantity: int, product: Product) -> bool:
+    """Validate quantity against product stock.
+
+    Args:
+        quantity: Quantity to validate
+        product: Product instance to check stock against
+
+    Returns:
+        True if quantity is valid, False otherwise
+    """
     return 0 < quantity <= product.stock
 
 
-def create_order_items_from_cart(order, cart):
-    """Create order items from cart contents."""
+def create_order_items_from_cart(order: Order, cart: Cart) -> None:
+    """Create order items from cart contents.
+
+    Args:
+        order: Order instance to add items to
+        cart: Cart instance containing items to add
+    """
     for item in cart:
         product = Product.objects.get(id=item['product_id'])
         price_str = item['price'].replace('$', '').strip()
@@ -76,21 +118,42 @@ def create_order_items_from_cart(order, cart):
         )
 
 
-def get_payment_display_name(payment_method):
-    """Get display name for payment method."""
+def get_payment_display_name(payment_method: str) -> str:
+    """Get display name for payment method.
+
+    Args:
+        payment_method: Payment method key
+
+    Returns:
+        Display name for the payment method
+    """
     return settings.PAYMENT_DISPLAY_NAMES.get(
         payment_method, 'Credit/Debit Card'
     )
 
 
-def get_status_display_name(status):
-    """Get display name for order status."""
+def get_status_display_name(status: str) -> str:
+    """Get display name for order status.
+
+    Args:
+        status: Order status key
+
+    Returns:
+        Display name for the order status
+    """
     status_choices = dict(settings.ORDER_STATUS_CHOICES)
     return status_choices.get(status, status)
 
 
-def cart_detail(request):
-    """Display cart page."""
+def cart_detail(request: HttpRequest) -> HttpResponse:
+    """Display cart page.
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        Rendered cart page
+    """
     cart = Cart(request)
     cart.update_stock_info()
 
@@ -100,10 +163,22 @@ def cart_detail(request):
 
 
 @require_POST
-def cart_add(request, product_id):
-    """Add product to cart."""
+def cart_add(
+    request: HttpRequest, product_id: int
+) -> JsonResponse | HttpResponse:
+    """Add product to cart.
 
-    def add_operation(cart, product, request):
+    Args:
+        request: HTTP request object
+        product_id: ID of the product to add
+
+    Returns:
+        JsonResponse for AJAX requests, HttpResponse redirect otherwise
+    """
+
+    def add_operation(
+        cart: Cart, product: Product, request: HttpRequest
+    ) -> None:
         quantity = int(request.POST.get('quantity', 1))
         if not validate_quantity(quantity, product):
             raise ValueError('Invalid quantity')
@@ -118,10 +193,22 @@ def cart_add(request, product_id):
 
 
 @require_POST
-def cart_remove(request, product_id):
-    """Remove product from cart."""
+def cart_remove(
+    request: HttpRequest, product_id: int
+) -> JsonResponse | HttpResponse:
+    """Remove product from cart.
 
-    def remove_operation(cart, product, request):
+    Args:
+        request: HTTP request object
+        product_id: ID of the product to remove
+
+    Returns:
+        JsonResponse for AJAX requests, HttpResponse redirect otherwise
+    """
+
+    def remove_operation(
+        cart: Cart, product: Product, request: HttpRequest
+    ) -> None:
         cart.remove(product)
 
     return handle_cart_operation(
@@ -132,10 +219,22 @@ def cart_remove(request, product_id):
 
 
 @require_POST
-def cart_update(request, product_id):
-    """Update product quantity in cart."""
+def cart_update(
+    request: HttpRequest, product_id: int
+) -> JsonResponse | HttpResponse:
+    """Update product quantity in cart.
 
-    def update_operation(cart, product, request):
+    Args:
+        request: HTTP request object
+        product_id: ID of the product to update
+
+    Returns:
+        JsonResponse for AJAX requests, HttpResponse redirect otherwise
+    """
+
+    def update_operation(
+        cart: Cart, product: Product, request: HttpRequest
+    ) -> None:
         quantity = int(request.POST.get('quantity', 1))
         if not validate_quantity(quantity, product):
             raise ValueError('Invalid quantity')
@@ -158,8 +257,15 @@ def cart_update(request, product_id):
 
 
 @login_required
-def checkout(request):
-    """Process order checkout."""
+def checkout(request: HttpRequest) -> HttpResponse:
+    """Process order checkout.
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        Rendered checkout page or redirect to order detail
+    """
     cart = Cart(request)
 
     if len(cart) == 0:
@@ -225,7 +331,7 @@ def checkout(request):
                 messages.error(
                     request, settings.ORDER_MESSAGES['PAYMENT_FAILED']
                 )
-        except Exception as e:
+        except (ValidationError, ValueError, TypeError, AttributeError) as e:
             order.delete()
             messages.error(
                 request,
@@ -238,8 +344,15 @@ def checkout(request):
     })
 
 
-def validate_card_expiry(expiry_date):
-    """Validate that the card is not expired."""
+def validate_card_expiry(expiry_date: str) -> bool:
+    """Validate that the card is not expired.
+
+    Args:
+        expiry_date: Card expiry date in MM/YY format
+
+    Returns:
+        True if card is not expired, False otherwise
+    """
     try:
         month, year = expiry_date.split('/')
         month = int(month)
@@ -254,8 +367,19 @@ def validate_card_expiry(expiry_date):
         return False
 
 
-def get_card_details(request, payment_method):
-    """Extract card details from request."""
+def get_card_details(
+    request: HttpRequest, payment_method: str
+) -> dict[str, str] | None:
+    """Extract card details from request.
+
+    Args:
+        request: HTTP request object
+        payment_method: Payment method used
+
+    Returns:
+        Dictionary containing card details if payment method is 'card',
+        None otherwise
+    """
     if payment_method == 'card':
         return {
             'card_number': request.POST.get('card_number', ''),
@@ -266,8 +390,15 @@ def get_card_details(request, payment_method):
     return None
 
 
-def get_checkout_success_message(payment_method):
-    """Get success message based on payment method."""
+def get_checkout_success_message(payment_method: str) -> str:
+    """Get success message based on payment method.
+
+    Args:
+        payment_method: Payment method used
+
+    Returns:
+        Success message for the payment method
+    """
     if payment_method == 'cash_on_delivery':
         return settings.ORDER_MESSAGES['ORDER_CONFIRMATION_COD']
     else:
@@ -275,8 +406,16 @@ def get_checkout_success_message(payment_method):
 
 
 @login_required
-def order_detail(request, order_id):
-    """Display order details."""
+def order_detail(request: HttpRequest, order_id: int) -> HttpResponse:
+    """Display order details.
+
+    Args:
+        request: HTTP request object
+        order_id: ID of the order to display
+
+    Returns:
+        Rendered order detail page
+    """
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'orders/order_detail.html', {
         'order': order
@@ -284,8 +423,15 @@ def order_detail(request, order_id):
 
 
 @login_required
-def order_list(request):
-    """Display user order list."""
+def order_list(request: HttpRequest) -> HttpResponse:
+    """Display user order list.
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        Rendered order list page
+    """
     orders = Order.objects.filter(user=request.user).prefetch_related('items')
     return render(request, 'orders/order_list.html', {
         'orders': orders
@@ -293,8 +439,16 @@ def order_list(request):
 
 
 @login_required
-def update_order_status(request, order_id):
-    """Update order status."""
+def update_order_status(request: HttpRequest, order_id: int) -> HttpResponse:
+    """Update order status.
+
+    Args:
+        request: HTTP request object
+        order_id: ID of the order to update
+
+    Returns:
+        Rendered order detail page or redirect
+    """
     order = get_object_or_404(Order, id=order_id)
 
     if not OrderPermissionMixin.check_order_permission(
@@ -323,8 +477,16 @@ def update_order_status(request, order_id):
 
 
 @login_required
-def cancel_order(request, order_id):
-    """Cancel order."""
+def cancel_order(request: HttpRequest, order_id: int) -> HttpResponse:
+    """Cancel order.
+
+    Args:
+        request: HTTP request object
+        order_id: ID of the order to cancel
+
+    Returns:
+        Redirect to order detail page
+    """
     order = get_object_or_404(Order, id=order_id, user=request.user)
 
     if not order.can_be_canceled():
@@ -350,8 +512,21 @@ def cancel_order(request, order_id):
     return redirect('orders:order_detail', order_id=order_id)
 
 
-def process_payment(payment_method, order, card_details=None):
-    """Process payment."""
+def process_payment(
+    payment_method: str,
+    order: Order,
+    card_details: dict[str, str] | None = None
+) -> bool:
+    """Process payment.
+
+    Args:
+        payment_method: Payment method used
+        order: Order instance to process payment for
+        card_details: Optional card details for card payments
+
+    Returns:
+        True if payment was successful, False otherwise
+    """
     success_rates = {
         'card': 0.95,
         'cash_on_delivery': 1.0,
@@ -382,8 +557,13 @@ def process_payment(payment_method, order, card_details=None):
     return random.random() < success_rate
 
 
-def send_order_notifications(order, payment_method):
-    """Send order email notifications."""
+def send_order_notifications(order: Order, payment_method: str) -> None:
+    """Send order email notifications.
+
+    Args:
+        order: Order instance to send notifications for
+        payment_method: Payment method used
+    """
     payment_display = get_payment_display_name(payment_method)
     user_name = order.user.get_full_name() or order.user.username
 
@@ -392,8 +572,16 @@ def send_order_notifications(order, payment_method):
     send_admin_order_notification(order, user_name, payment_display)
 
 
-def send_customer_order_notification(order, user_name, payment_display):
-    """Send order confirmation email to customer."""
+def send_customer_order_notification(
+    order: Order, user_name: str, payment_display: str
+) -> None:
+    """Send order confirmation email to customer.
+
+    Args:
+        order: Order instance to send confirmation for
+        user_name: Name of the user
+        payment_display: Display name for payment method
+    """
     from django.conf import settings
 
     customer_subject = f'Order Confirmation #{order.id} - Hop & Barley'
@@ -416,8 +604,16 @@ def send_customer_order_notification(order, user_name, payment_display):
     )
 
 
-def send_admin_order_notification(order, user_name, payment_display):
-    """Send order notification to admin."""
+def send_admin_order_notification(
+    order: Order, user_name: str, payment_display: str
+) -> None:
+    """Send order notification to admin.
+
+    Args:
+        order: Order instance to send notification for
+        user_name: Name of the user
+        payment_display: Display name for payment method
+    """
     from django.conf import settings
 
     admin_subject = f'New Order #{order.id} - {user_name}'
@@ -433,8 +629,19 @@ def send_admin_order_notification(order, user_name, payment_display):
     )
 
 
-def build_customer_email_text(order, user_name, payment_display):
-    """Build customer email text content."""
+def build_customer_email_text(
+    order: Order, user_name: str, payment_display: str
+) -> str:
+    """Build customer email text content.
+
+    Args:
+        order: Order instance to build email for
+        user_name: Name of the user
+        payment_display: Display name for payment method
+
+    Returns:
+        Formatted email text content
+    """
     items_text = build_items_text(order)
     email_templates = settings.EMAIL_TEMPLATES
 
@@ -468,8 +675,19 @@ def build_customer_email_text(order, user_name, payment_display):
 """
 
 
-def build_admin_email_text(order, user_name, payment_display):
-    """Build admin email text content."""
+def build_admin_email_text(
+    order: Order, user_name: str, payment_display: str
+) -> str:
+    """Build admin email text content.
+
+    Args:
+        order: Order instance to build email for
+        user_name: Name of the user
+        payment_display: Display name for payment method
+
+    Returns:
+        Formatted admin email text content
+    """
     items_text = build_items_text(order)
     email_templates = settings.EMAIL_TEMPLATES
 
@@ -502,8 +720,15 @@ def build_admin_email_text(order, user_name, payment_display):
 """
 
 
-def build_items_text(order):
-    """Build items text for email content."""
+def build_items_text(order: Order) -> str:
+    """Build items text for email content.
+
+    Args:
+        order: Order instance to build items text for
+
+    Returns:
+        Formatted items text for email
+    """
     items_text = ""
     item_format = settings.EMAIL_TEMPLATES['ITEM_FORMAT']
     for item in order.items.all():
@@ -516,8 +741,16 @@ def build_items_text(order):
     return items_text
 
 
-def send_status_change_notification(order, old_status, new_status):
-    """Send order status change notification."""
+def send_status_change_notification(
+    order: Order, old_status: str, new_status: str
+) -> None:
+    """Send order status change notification.
+
+    Args:
+        order: Order instance to send notification for
+        old_status: Previous order status
+        new_status: New order status
+    """
     from django.conf import settings
 
     old_status_display = get_status_display_name(old_status)
@@ -550,9 +783,25 @@ def send_status_change_notification(order, old_status, new_status):
     )
 
 
-def build_status_change_email_text(order, user_name, old_status_display,
-                                   new_status_display, new_status):
-    """Build status change email text content."""
+def build_status_change_email_text(
+    order: Order,
+    user_name: str,
+    old_status_display: str,
+    new_status_display: str,
+    new_status: str
+) -> str:
+    """Build status change email text content.
+
+    Args:
+        order: Order instance to build email for
+        user_name: Name of the user
+        old_status_display: Display name for old status
+        new_status_display: Display name for new status
+        new_status: New status key
+
+    Returns:
+        Formatted status change email text content
+    """
     items_text = build_items_text(order)
     status_message = get_status_change_message(new_status)
     email_templates = settings.EMAIL_TEMPLATES
@@ -587,6 +836,13 @@ def build_status_change_email_text(order, user_name, old_status_display,
 """
 
 
-def get_status_change_message(new_status):
-    """Get message based on new status."""
+def get_status_change_message(new_status: str) -> str:
+    """Get message based on new status.
+
+    Args:
+        new_status: New order status key
+
+    Returns:
+        Status change message for the new status
+    """
     return settings.STATUS_CHANGE_MESSAGES.get(new_status, "")

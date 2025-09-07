@@ -8,51 +8,78 @@ User = get_user_model()
 
 
 class EmailLoginForm(AuthenticationForm):
-    """Login form using email."""
-    username = forms.EmailField(label='Email Address',
-                                widget=forms.EmailInput(
-                                    attrs={'class': 'input',
-                                           'placeholder': 'Enter your email'}))
+    """Login form using email instead of username."""
+    username = forms.EmailField(
+        label='Email Address',
+        widget=forms.EmailInput(
+            attrs={'class': 'input', 'placeholder': 'Enter your email'}
+        )
+    )
     password = forms.CharField(
         widget=forms.PasswordInput(
-            attrs={'class': 'input', 'placeholder': 'Enter your password'}))
+            attrs={'class': 'input', 'placeholder': 'Enter your password'}
+        )
+    )
 
 
 class UserRegisterForm(UserCreationForm):
-    """User registration form."""
+    """User registration form with additional fields."""
     email = forms.EmailField(
         label='Email Address',
         widget=forms.EmailInput(
-            attrs={'class': 'input', 'placeholder': 'Enter your email'}), )
-    username = forms.CharField(label='Username', widget=forms.TextInput(
-        attrs={'class': 'input', 'placeholder': 'enter your username'}))
-    phone = PhoneNumberField(
-        label='Phone number', required=False,
+            attrs={'class': 'input', 'placeholder': 'Enter your email'}
+        )
+    )
+    username = forms.CharField(
+        label='Username',
         widget=forms.TextInput(
-            attrs={'class': 'input',
-                   'placeholder': 'enter your phone number'}))
+            attrs={'class': 'input', 'placeholder': 'enter your username'}
+        )
+    )
+    phone = PhoneNumberField(
+        label='Phone number',
+        required=False,
+        widget=forms.TextInput(
+            attrs={'class': 'input', 'placeholder': 'enter your phone number'}
+        )
+    )
     password1 = forms.CharField(
-        label='Password', widget=forms.PasswordInput(
-            attrs={'class': 'input', 'placeholder': 'enter your password'}))
+        label='Password',
+        widget=forms.PasswordInput(
+            attrs={'class': 'input', 'placeholder': 'enter your password'}
+        )
+    )
     password2 = forms.CharField(
         label='Confirm password',
         widget=forms.PasswordInput(
-            attrs={'class': 'input',
-                   'placeholder': 'repeat your password'}))
+            attrs={'class': 'input', 'placeholder': 'repeat your password'}
+        )
+    )
 
     class Meta:
         model = User
         fields = ('email', 'username', 'first_name', 'last_name', 'phone',)
 
-    def clean_email(self):
-        """Validate email uniqueness."""
+    def clean_email(self) -> str:
+        """Validate email uniqueness.
+
+        Returns:
+            Cleaned email address
+
+        Raises:
+            ValidationError: If email is already registered
+        """
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email=email).exists():
             raise forms.ValidationError('Email already registered')
         return email
 
-    def clean_phone(self):
-        """Validate phone number."""
+    def clean_phone(self) -> any:
+        """Validate phone number.
+
+        Returns:
+            Cleaned phone number or None
+        """
         phone = self.cleaned_data.get('phone')
         return phone
 
@@ -64,7 +91,6 @@ class UserProfileForm(forms.ModelForm):
         label='Phone Number',
         required=False,
         widget=forms.TextInput(
-
             attrs={'class': 'Input', 'placeholder': 'Phone Number'}
         )
     )
@@ -94,16 +120,30 @@ class UserProfileForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialize form with readonly email field.
+
+        Args:
+            *args: Positional arguments
+            **kwargs: Keyword arguments
+        """
         super().__init__(*args, **kwargs)
         self.fields['email'].widget.attrs['readonly'] = True
 
-    def clean_email(self):
-        """Ensure email cannot be changed."""
+    def clean_email(self) -> str:
+        """Ensure email cannot be changed.
+
+        Returns:
+            Current user's email address
+        """
         return self.instance.email
 
-    def clean_phone(self):
-        """Validate phone number."""
+    def clean_phone(self) -> any:
+        """Validate phone number.
+
+        Returns:
+            Cleaned phone number or None
+        """
         phone = self.cleaned_data.get('phone')
         if phone:
             return phone
@@ -113,7 +153,13 @@ class UserProfileForm(forms.ModelForm):
 class CustomPasswordChangeForm(PasswordChangeForm):
     """Custom password change form with better styling."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialize form with custom styling.
+
+        Args:
+            *args: Positional arguments
+            **kwargs: Keyword arguments
+        """
         super().__init__(*args, **kwargs)
         self.fields['old_password'].widget.attrs.update({
             'class': 'Input',
@@ -157,7 +203,15 @@ class ResetPasswordForm(forms.Form):
         )
     )
 
-    def clean(self):
+    def clean(self) -> dict[str, any]:
+        """Validate password fields.
+
+        Returns:
+            Cleaned form data
+
+        Raises:
+            ValidationError: If passwords don't match or are too short
+        """
         cleaned_data = super().clean()
         new_password1 = cleaned_data.get('new_password1')
         new_password2 = cleaned_data.get('new_password2')

@@ -6,7 +6,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 class User(AbstractUser):
     """Custom user model."""
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username',]
+    REQUIRED_FIELDS = ['username', ]
     email = models.EmailField(unique=True)
     phone = PhoneNumberField(null=True, blank=True)
     image = models.ImageField(upload_to='profile_image', null=True, blank=True,

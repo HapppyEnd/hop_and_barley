@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load my_filters %}
 
 {% block title %}My Account | Hop & Barley{% endblock %}
 
@@ -11,6 +12,7 @@
     <div class="account-tabs">
       <button class="account-tab active" data-tab-target="#order-history">Order History</button>
       <button class="account-tab" data-tab-target="#account-info">Account Information</button>
+      <button class="account-tab" data-tab-target="#my-reviews">My Reviews</button>
     </div>
 
     <!-- Tabs Content -->
@@ -147,6 +149,85 @@
               <button type="submit" class="button button--secondary button--full-width">Logout</button>
             </form>
           </div>
+        </div>
+      </div>
+
+      <!-- My Reviews Panel -->
+      <div id="my-reviews" class="tab-pane">
+        <div class="reviews-section">
+          <div class="reviews-header">
+            <h2>My Reviews</h2>
+            <a href="{% url 'products:product-list' %}" class="button button--secondary button--flex-item">
+              <i class="fa-solid fa-plus"></i>
+              Write New Review
+            </a>
+          </div>
+          
+          {% if user_reviews %}
+            <div class="reviews-list">
+              {% for review in user_reviews %}
+                <div class="review-item">
+                  <div class="review-item__header">
+                    <div class="review-item__product">
+                      <img src="{% if review.product.image %}{{ review.product.image.url }}{% else %}{% static 'img/products/default_product.png' %}{% endif %}" 
+                           alt="{{ review.product.name }}" class="review-item__image">
+                      <div class="review-item__product-info">
+                        <h3 class="review-item__product-name">
+                          <a href="{% url 'products:product-detail' review.product.slug %}">
+                            {{ review.product.name }}
+                          </a>
+                        </h3>
+                        <p class="review-item__product-price">${{ review.product.price }}</p>
+                      </div>
+                    </div>
+                    <div class="review-item__actions">
+                      <a href="{% url 'products:review-update' review.product.slug review.id %}" 
+                         class="button button--small button--secondary">
+                        <i class="fa-solid fa-edit"></i>
+                        Edit
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div class="review-item__content">
+                    <div class="review-item__rating">
+                      {% for _ in review.rating|range %}
+                        <i class="fa-solid fa-star"></i>
+                      {% endfor %}
+                      {% for _ in 5|range:review.rating %}
+                        <i class="fa-regular fa-star"></i>
+                      {% endfor %}
+                    </div>
+                    
+                    {% if review.title %}
+                      <h4 class="review-item__title">{{ review.title }}</h4>
+                    {% endif %}
+                    
+                    <p class="review-item__comment">{{ review.comment }}</p>
+                    
+                    <div class="review-item__meta">
+                      <span class="review-item__date">
+                        <i class="fa-solid fa-calendar"></i>
+                        {{ review.created_at|date:"F d, Y" }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-state__icon">
+                <i class="fa-solid fa-star"></i>
+              </div>
+              <h3>No Reviews Yet</h3>
+              <p>You haven't written any reviews yet. Start by exploring our products and sharing your experience!</p>
+              <a href="{% url 'products:product-list' %}" class="button button--primary">
+                <i class="fa-solid fa-shopping-bag"></i>
+                Browse Products
+              </a>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>

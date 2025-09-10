@@ -7,29 +7,14 @@ register = template.Library()
 
 
 @register.filter(name='range')
-def template_range(stop: int, start: int = 0) -> range:
-    """Create a range filter for templates.
-
-    Args:
-        stop: End value for range
-        start: Start value for range (default: 0)
-
-    Returns:
-        Range object from start to stop
-    """
-    return range(start, stop)
+def template_range(value: int, start: int = 0) -> range:
+    """Create a range filter for templates."""
+    return range(start, value)
 
 
 @register.filter
 def avg_rating(reviews: QuerySet) -> int:
-    """Calculate average rating from reviews queryset.
-
-    Args:
-        reviews: QuerySet of review objects
-
-    Returns:
-        Rounded average rating or 0 if no reviews
-    """
+    """Calculate average rating from reviews queryset."""
     if reviews:
         avg = reviews.aggregate(Avg('rating'))['rating__avg']
         return round(avg or 0)
@@ -38,15 +23,7 @@ def avg_rating(reviews: QuerySet) -> int:
 
 @register.simple_tag(takes_context=True)
 def modify_query(context: dict, **kwargs) -> str:
-    """Modify query parameters in URL.
-
-    Args:
-        context: Template context containing request
-        **kwargs: Query parameters to modify
-
-    Returns:
-        URL-encoded query string
-    """
+    """Modify query parameters in URL."""
     request = context['request']
     params = request.GET.copy()
 
@@ -62,15 +39,7 @@ def modify_query(context: dict, **kwargs) -> str:
 
 @register.filter
 def get_item(dictionary: dict, key: str) -> any:
-    """Get item from dictionary by key.
-
-    Args:
-        dictionary: Dictionary to get item from
-        key: Key to look up
-
-    Returns:
-        Value from dictionary or None if not found
-    """
+    """Get item from dictionary by key."""
     try:
         return dictionary.get(str(key))
     except (AttributeError, TypeError, KeyError):

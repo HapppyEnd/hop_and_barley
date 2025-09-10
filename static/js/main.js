@@ -393,6 +393,61 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // --- Star Rating Logic ---
+    const starRating = document.querySelector('.star-rating');
+    if (starRating) {
+        const ratingInput = document.querySelector('input[name="rating"]');
+        const stars = starRating.querySelectorAll('i');
+
+        // Initialize with existing rating if any
+        const currentRating = parseInt(ratingInput.value) || 0;
+        if (currentRating > 0) {
+            stars.forEach((s, i) => {
+                if (i < currentRating) {
+                    s.classList.add('active');
+                    s.style.color = '#ffc107';
+                }
+            });
+        }
+
+        stars.forEach((star, index) => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                ratingInput.value = rating;
+                
+                // Update visual state
+                stars.forEach((s, i) => {
+                    if (i < rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                stars.forEach((s, i) => {
+                    if (i < rating) {
+                        s.style.color = '#ffc107';
+                    } else {
+                        s.style.color = '#ddd';
+                    }
+                });
+            });
+        });
+
+        starRating.addEventListener('mouseleave', function() {
+            const currentRating = parseInt(ratingInput.value) || 0;
+            stars.forEach((s, i) => {
+                if (i < currentRating) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
+    }
 
  
  });

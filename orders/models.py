@@ -11,8 +11,9 @@ from products.models import Product
 class Order(models.Model):
     """User order model.
 
-    Represents a customer order containing multiple products with quantities
-    and prices. Tracks order status, shipping information, and timestamps.
+    Represents a customer order containing multiple products with
+    quantities and prices. Tracks order status, shipping information,
+    and timestamps.
     """
 
     user = models.ForeignKey(
@@ -49,21 +50,13 @@ class Order(models.Model):
 
     @property
     def total_price(self) -> str:
-        """Return total order amount as formatted string.
-
-        Returns:
-            Formatted total price string (e.g., "$25.99")
-        """
+        """Return total order amount as formatted string."""
         total = self.items.aggregate(total=Sum(
             F('price') * F('quantity')))['total'] or 0
         return f"${total}"
 
     def reduce_stock(self) -> None:
-        """Reduce product stock when order is confirmed.
-
-        Raises:
-            ValidationError: If there's not enough stock for any item
-        """
+        """Reduce product stock when order is confirmed."""
         with transaction.atomic():
             for item in self.items.select_for_update().all():
                 product = item.product
@@ -84,19 +77,11 @@ class Order(models.Model):
                 product.save(update_fields=['stock'])
 
     def can_be_canceled(self) -> bool:
-        """Check if order can be canceled.
-
-        Returns:
-            True if order can be canceled, False otherwise
-        """
+        """Check if order can be canceled."""
         return self.status in settings.CANCELLABLE_STATUSES
 
     def cancel_order(self) -> None:
-        """Cancel order and restore stock.
-
-        Raises:
-            ValidationError: If order cannot be canceled
-        """
+        """Cancel order and restore stock."""
         if not self.can_be_canceled():
             raise ValidationError("This order cannot be canceled")
 
@@ -143,21 +128,14 @@ class OrderItem(models.Model):
         verbose_name_plural = 'Order Items'
 
     def save(self, *args, **kwargs) -> None:
-        """Save order item with automatic price setting.
-
-        Args:
-            *args: Positional arguments for parent save method
-            **kwargs: Keyword arguments for parent save method
-        """
-        if not self.price:
+        """Save order item with automatic price setting."""
+        if not self.price and self.product:
             self.price = self.product.price
         super().save(*args, **kwargs)
 
     @property
     def total(self) -> str:
-        """Return total item cost (price × quantity) as formatted string.
-
-        Returns:
-            Formatted total cost string (e.g., "$15.99")
-        """
+        """Return total item cost (price × quantity) as formatted string."""
+        if self.price is None or self.quantity is None:
+            return "$0.00"
         return f"${self.price * self.quantity}"

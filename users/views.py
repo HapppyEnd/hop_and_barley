@@ -24,12 +24,7 @@ from users.models import User
 
 
 def log_to_console(template_key: str, **kwargs) -> None:
-    """Helper function to log formatted messages to console.
-
-    Args:
-        template_key: Key to look up in CONSOLE_LOGS setting
-        **kwargs: Keyword arguments to format the template with
-    """
+    """Helper function to log formatted messages to console."""
     if template_key in settings.CONSOLE_LOGS:
         template = settings.CONSOLE_LOGS[template_key]
         print(template.format(**kwargs))
@@ -41,11 +36,7 @@ class UserLoginView(LoginView):
     form_class = EmailLoginForm
 
     def get_initial(self) -> dict[str, any]:
-        """Get initial form data with pre-filled email if available.
-
-        Returns:
-            Dictionary with initial form data
-        """
+        """Get initial form data with pre-filled email if available."""
         initial = super(UserLoginView, self).get_initial()
         email = self.request.session.get('register_email')
         if email:
@@ -55,14 +46,7 @@ class UserLoginView(LoginView):
         return initial
 
     def form_valid(self, form) -> HttpResponse:
-        """Handle valid form submission.
-
-        Args:
-            form: Valid form instance
-
-        Returns:
-            HttpResponse redirect after successful login
-        """
+        """Handle valid form submission."""
         remember_me = self.request.POST.get('remember_me') == 'on'
         if not remember_me:
             self.request.session.set_expiry(0)
@@ -74,14 +58,7 @@ class UserLoginView(LoginView):
         return super().form_valid(form)
 
     def form_invalid(self, form) -> HttpResponse:
-        """Handle invalid form submission.
-
-        Args:
-            form: Invalid form instance
-
-        Returns:
-            HttpResponse with form errors
-        """
+        """Handle invalid form submission."""
         messages.error(self.request, settings.MESSAGES['login_error'])
         return super().form_invalid(form)
 
@@ -93,14 +70,7 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('users:login')
 
     def form_valid(self, form) -> HttpResponse:
-        """Handle valid registration form submission.
-
-        Args:
-            form: Valid form instance
-
-        Returns:
-            HttpResponse redirect to login page
-        """
+        """Handle valid registration form submission."""
         user = form.save()
         self.request.session['register_email'] = user.email
         self.request.session.modified = True
@@ -136,14 +106,7 @@ class AccountView(TemplateView):
     template_name = 'users/account.html'
 
     def get_context_data(self, **kwargs) -> dict[str, any]:
-        """Get context data for account page with orders and filters.
-
-        Args:
-            **kwargs: Additional context data
-
-        Returns:
-            Dictionary with context data including orders and filters
-        """
+        """Get context data for account page with orders and filters."""
         context = super().get_context_data(**kwargs)
         user = self.request.user
         status_filter = self.request.GET.get('status', '')
@@ -168,6 +131,12 @@ class AccountView(TemplateView):
             'status_choices': settings.ORDER_STATUS_CHOICES,
         })
 
+        # Add user reviews
+        from products.models import Review
+        context['user_reviews'] = Review.objects.filter(
+            user=user
+        ).select_related('product').order_by('-created_at')[:10]
+
         return context
 
 
@@ -180,37 +149,16 @@ class ProfileUpdateView(UpdateView):
     success_url = reverse_lazy('users:account')
 
     def get_object(self, queryset=None) -> User:
-        """Get the user object to update.
-
-        Args:
-            queryset: Optional queryset (not used)
-
-        Returns:
-            Current user instance
-        """
+        """Get the user object to update."""
         return self.request.user
 
     def form_valid(self, form) -> HttpResponse:
-        """Handle valid form submission.
-
-        Args:
-            form: Valid form instance
-
-        Returns:
-            HttpResponse redirect after successful update
-        """
+        """Handle valid form submission."""
         messages.success(self.request, settings.MESSAGES['profile_updated'])
         return super().form_valid(form)
 
     def form_invalid(self, form) -> HttpResponse:
-        """Handle invalid form submission.
-
-        Args:
-            form: Invalid form instance
-
-        Returns:
-            HttpResponse with form errors
-        """
+        """Handle invalid form submission."""
         messages.error(self.request, settings.MESSAGES['profile_errors'])
         return super().form_invalid(form)
 
@@ -223,40 +171,19 @@ class PasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy('users:account')
 
     def form_valid(self, form) -> HttpResponse:
-        """Handle valid password change form submission.
-
-        Args:
-            form: Valid form instance
-
-        Returns:
-            HttpResponse redirect after successful password change
-        """
+        """Handle valid password change form submission."""
         messages.success(self.request, settings.MESSAGES['password_changed'])
         return super().form_valid(form)
 
     def form_invalid(self, form) -> HttpResponse:
-        """Handle invalid password change form submission.
-
-        Args:
-            form: Invalid form instance
-
-        Returns:
-            HttpResponse with form errors
-        """
+        """Handle invalid password change form submission."""
         messages.error(self.request, settings.MESSAGES['password_errors'])
         return super().form_invalid(form)
 
 
 @require_http_methods(["GET", "POST"])
 def forgot_password(request: HttpRequest) -> HttpResponse:
-    """View for handling password reset requests.
-
-    Args:
-        request: HTTP request object
-
-    Returns:
-        Rendered forgot password page or redirect
-    """
+    """View for handling password reset requests."""
     if request.method == 'POST':
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
@@ -337,14 +264,7 @@ def forgot_password(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods(["GET", "POST"])
 def reset_password(request: HttpRequest) -> HttpResponse:
-    """View for handling password reset with session.
-
-    Args:
-        request: HTTP request object
-
-    Returns:
-        Rendered reset password page or redirect
-    """
+    """View for handling password reset with session."""
     # Check if reset session exists
     user_id = request.session.get('password_reset_user_id')
     reset_email = request.session.get('password_reset_email')

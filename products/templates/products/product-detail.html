@@ -97,7 +97,34 @@
 
             <!-- Latest Reviews Section -->
             <section class="reviews-section">
-                <h2 class="reviews-title">Latest reviews</h2>
+                <div class="reviews-header">
+                    <h2 class="reviews-title">Latest reviews</h2>
+                    {% if user.is_authenticated %}
+                        {% if can_review and not has_reviewed %}
+                            <a href="{% url 'products:review-create' product.slug %}" 
+                               class="button button--primary button--flex-item">
+                                Write Review
+                            </a>
+                        {% elif has_reviewed %}
+                            <a href="{% url 'products:review-update' product.slug user_review.id %}" 
+                               class="button button--secondary button--flex-item">
+                                <i class="fa-solid fa-edit"></i>
+                                Edit Review
+                            </a>
+                        {% elif not can_review %}
+                            <span class="review-status">
+                                <i class="fa-solid fa-truck review-status__icon--info"></i>
+                                {{ REVIEW_AFTER_DELIVERY }}
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'users:login' %}" 
+                           class="button button--secondary button--flex-item">
+                            <i class="fa-solid fa-sign-in-alt"></i>
+                            {{ LOGIN_TO_REVIEW }}
+                        </a>
+                    {% endif %}
+                </div>
                 <div class="reviews-grid">
                     {% for review in reviews %}
                         <div class="review-card">

@@ -86,25 +86,12 @@ def handle_cart_operation(
 
 
 def validate_quantity(quantity: int, product: Product) -> bool:
-    """Validate quantity against product stock.
-
-    Args:
-        quantity: Quantity to validate
-        product: Product instance to check stock against
-
-    Returns:
-        True if quantity is valid, False otherwise
-    """
+    """Validate quantity against product stock."""
     return 0 < quantity <= product.stock
 
 
 def create_order_items_from_cart(order: Order, cart: Cart) -> None:
-    """Create order items from cart contents.
-
-    Args:
-        order: Order instance to add items to
-        cart: Cart instance containing items to add
-    """
+    """Create order items from cart contents."""
     for item in cart:
         product = Product.objects.get(id=item['product_id'])
         price_str = item['price'].replace('$', '').strip()
@@ -119,41 +106,20 @@ def create_order_items_from_cart(order: Order, cart: Cart) -> None:
 
 
 def get_payment_display_name(payment_method: str) -> str:
-    """Get display name for payment method.
-
-    Args:
-        payment_method: Payment method key
-
-    Returns:
-        Display name for the payment method
-    """
+    """Get display name for payment method."""
     return settings.PAYMENT_DISPLAY_NAMES.get(
         payment_method, 'Credit/Debit Card'
     )
 
 
 def get_status_display_name(status: str) -> str:
-    """Get display name for order status.
-
-    Args:
-        status: Order status key
-
-    Returns:
-        Display name for the order status
-    """
+    """Get display name for order status."""
     status_choices = dict(settings.ORDER_STATUS_CHOICES)
     return status_choices.get(status, status)
 
 
 def cart_detail(request: HttpRequest) -> HttpResponse:
-    """Display cart page.
-
-    Args:
-        request: HTTP request object
-
-    Returns:
-        Rendered cart page
-    """
+    """Display cart page."""
     cart = Cart(request)
     cart.update_stock_info()
 
@@ -258,14 +224,7 @@ def cart_update(
 
 @login_required
 def checkout(request: HttpRequest) -> HttpResponse:
-    """Process order checkout.
-
-    Args:
-        request: HTTP request object
-
-    Returns:
-        Rendered checkout page or redirect to order detail
-    """
+    """Process order checkout."""
     cart = Cart(request)
 
     if len(cart) == 0:
@@ -345,14 +304,7 @@ def checkout(request: HttpRequest) -> HttpResponse:
 
 
 def validate_card_expiry(expiry_date: str) -> bool:
-    """Validate that the card is not expired.
-
-    Args:
-        expiry_date: Card expiry date in MM/YY format
-
-    Returns:
-        True if card is not expired, False otherwise
-    """
+    """Validate that the card is not expired."""
     try:
         month, year = expiry_date.split('/')
         month = int(month)
@@ -391,14 +343,7 @@ def get_card_details(
 
 
 def get_checkout_success_message(payment_method: str) -> str:
-    """Get success message based on payment method.
-
-    Args:
-        payment_method: Payment method used
-
-    Returns:
-        Success message for the payment method
-    """
+    """Get success message based on payment method."""
     if payment_method == 'cash_on_delivery':
         return settings.ORDER_MESSAGES['ORDER_CONFIRMATION_COD']
     else:
@@ -407,15 +352,7 @@ def get_checkout_success_message(payment_method: str) -> str:
 
 @login_required
 def order_detail(request: HttpRequest, order_id: int) -> HttpResponse:
-    """Display order details.
-
-    Args:
-        request: HTTP request object
-        order_id: ID of the order to display
-
-    Returns:
-        Rendered order detail page
-    """
+    """Display order details."""
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'orders/order_detail.html', {
         'order': order
@@ -424,14 +361,7 @@ def order_detail(request: HttpRequest, order_id: int) -> HttpResponse:
 
 @login_required
 def order_list(request: HttpRequest) -> HttpResponse:
-    """Display user order list.
-
-    Args:
-        request: HTTP request object
-
-    Returns:
-        Rendered order list page
-    """
+    """Display user order list."""
     orders = Order.objects.filter(user=request.user).prefetch_related('items')
     return render(request, 'orders/order_list.html', {
         'orders': orders
@@ -440,15 +370,7 @@ def order_list(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def update_order_status(request: HttpRequest, order_id: int) -> HttpResponse:
-    """Update order status.
-
-    Args:
-        request: HTTP request object
-        order_id: ID of the order to update
-
-    Returns:
-        Rendered order detail page or redirect
-    """
+    """Update order status."""
     order = get_object_or_404(Order, id=order_id)
 
     if not OrderPermissionMixin.check_order_permission(
@@ -478,15 +400,7 @@ def update_order_status(request: HttpRequest, order_id: int) -> HttpResponse:
 
 @login_required
 def cancel_order(request: HttpRequest, order_id: int) -> HttpResponse:
-    """Cancel order.
-
-    Args:
-        request: HTTP request object
-        order_id: ID of the order to cancel
-
-    Returns:
-        Redirect to order detail page
-    """
+    """Cancel order."""
     order = get_object_or_404(Order, id=order_id, user=request.user)
 
     if not order.can_be_canceled():
@@ -558,12 +472,7 @@ def process_payment(
 
 
 def send_order_notifications(order: Order, payment_method: str) -> None:
-    """Send order email notifications.
-
-    Args:
-        order: Order instance to send notifications for
-        payment_method: Payment method used
-    """
+    """Send order email notifications."""
     payment_display = get_payment_display_name(payment_method)
     user_name = order.user.get_full_name() or order.user.username
 
@@ -721,14 +630,7 @@ def build_admin_email_text(
 
 
 def build_items_text(order: Order) -> str:
-    """Build items text for email content.
-
-    Args:
-        order: Order instance to build items text for
-
-    Returns:
-        Formatted items text for email
-    """
+    """Build items text for email content."""
     items_text = ""
     item_format = settings.EMAIL_TEMPLATES['ITEM_FORMAT']
     for item in order.items.all():
@@ -837,12 +739,5 @@ def build_status_change_email_text(
 
 
 def get_status_change_message(new_status: str) -> str:
-    """Get message based on new status.
-
-    Args:
-        new_status: New order status key
-
-    Returns:
-        Status change message for the new status
-    """
+    """Get message based on new status."""
     return settings.STATUS_CHANGE_MESSAGES.get(new_status, "")

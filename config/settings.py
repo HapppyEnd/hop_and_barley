@@ -254,25 +254,47 @@ EMAIL_TEMPLATES = {
 # Status change messages
 STATUS_CHANGE_MESSAGES = {
     ORDER_STATUS_PLACED: (
-        "Your order has been confirmed and is being prepared. "
-        "You will pay when you receive your order.\n\n"
+        'Your order has been confirmed and is being prepared. '
+        'You will pay when you receive your order.\n\n'
     ),
     ORDER_STATUS_PAID: (
-        "Your order has been paid and is being processed. "
-        "We'll prepare it for shipping soon.\n\n"
+        'Your order has been paid and is being processed. '
+        'We\'ll prepare it for shipping soon.\n\n'
     ),
     ORDER_STATUS_SHIPPED: (
-        "Your order has been shipped and is on its way to you. "
-        "You should receive it soon.\n\n"
+        'Your order has been shipped and is on its way to you. '
+        'You should receive it soon.\n\n'
     ),
     ORDER_STATUS_DELIVERED: (
-        "Your order has been delivered. Thank you for your purchase!\n\n"
+        'Your order has been delivered. Thank you for your purchase!\n\n'
     ),
     ORDER_STATUS_CANCELED: (
-        "Your order has been canceled. If you have any questions, "
-        "please contact us.\n\n"
+        'Your order has been canceled. If you have any questions, '
+        'please contact us.\n\n'
     ),
 }
+
+# Review messages
+REVIEW_DELIVERY_REQUIRED = (
+    'You can only review products after they have been delivered.'
+)
+REVIEW_ALREADY_EXISTS = 'You have already reviewed this product.'
+REVIEW_SUCCESS_MESSAGE = 'Thank you for your review!'
+REVIEW_AFTER_DELIVERY = 'You can review after delivery'
+REVIEW_ALREADY_REVIEWED = 'You have reviewed this product'
+LOGIN_TO_REVIEW = 'Login to Review'
+WRITE_REVIEW = 'Write Review'
+SUBMIT_REVIEW = 'Submit Review'
+CANCEL = 'Cancel'
+
+# Review form labels
+RATING_LABEL = 'Rating'
+TITLE_LABEL = 'Title (optional)'
+COMMENT_LABEL = 'Your Review'
+
+# Review form placeholders
+TITLE_PLACEHOLDER = 'Review title (optional)'
+COMMENT_PLACEHOLDER = 'Write your review here...'
 
 # Email settings
 # For development, use file backend to save emails to files
@@ -293,7 +315,7 @@ ADMIN_EMAIL = 'admin@hopandbarley.com'
 
 # Email templates
 PASSWORD_RESET_EMAIL_SUBJECT = 'Password Reset - Hop & Barley'
-PASSWORD_RESET_EMAIL_TEMPLATE = """
+PASSWORD_RESET_EMAIL_TEMPLATE = '''
 Hello {user_name},
 
 You requested a password reset for your Hop & Barley account.
@@ -307,7 +329,7 @@ If you did not request this password reset, please ignore this email.
 
 Best regards,
 Hop & Barley Team
-"""
+'''
 
 # Messages
 MESSAGES = {
@@ -343,7 +365,7 @@ MESSAGES = {
 
 # Console logging templates
 CONSOLE_LOGS = {
-    'password_reset_email_sent': """
+    'password_reset_email_sent': '''
 ==================================================
 PASSWORD RESET EMAIL SENT
 ==================================================
@@ -354,31 +376,31 @@ User: {username} (ID: {user_id})
 Session stored for user ID: {user_id}
 Reset valid until: {valid_until}
 ==================================================
-""",
-    'password_reset_email_failed': """
+''',
+    'password_reset_email_failed': '''
 ==================================================
 EMAIL SENDING FAILED
 ==================================================
 Error: {error}
 To: {email}
 ==================================================
-""",
-    'password_reset_user_not_found': """
+''',
+    'password_reset_user_not_found': '''
 ==================================================
 PASSWORD RESET REQUEST - USER NOT FOUND
 ==================================================
 Email: {email}
 Note: User not found in database
 ==================================================
-""",
-    'password_reset_no_session': """
+''',
+    'password_reset_no_session': '''
 ==================================================
 PASSWORD RESET - NO SESSION DATA
 ==================================================
 No valid reset session found
 ==================================================
-""",
-    'password_reset_session_expired': """
+''',
+    'password_reset_session_expired': '''
 ==================================================
 PASSWORD RESET - SESSION EXPIRED
 ==================================================
@@ -386,8 +408,8 @@ Session timestamp: {session_time}
 Current time: {current_time}
 Time difference: {time_diff:.1f} minutes
 ==================================================
-""",
-    'password_reset_attempt': """
+''',
+    'password_reset_attempt': '''
 ==================================================
 PASSWORD RESET ATTEMPT
 ==================================================
@@ -395,16 +417,16 @@ User: {username} (ID: {user_id})
 Email: {email}
 Session valid until: {valid_until}
 ==================================================
-""",
-    'password_reset_user_not_found_session': """
+''',
+    'password_reset_user_not_found_session': '''
 ==================================================
 PASSWORD RESET - USER NOT FOUND
 ==================================================
 User ID: {user_id}
 Email: {email}
 ==================================================
-""",
-    'password_reset_successful': """
+''',
+    'password_reset_successful': '''
 ==================================================
 PASSWORD RESET SUCCESSFUL
 ==================================================
@@ -413,5 +435,5 @@ Email: {email}
 Password updated successfully
 Reset session cleared
 ==================================================
-""",
+''',
 }

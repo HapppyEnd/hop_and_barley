@@ -32,14 +32,7 @@ class OrderAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
     def get_queryset(self, request) -> QuerySet[Order]:
-        """Get queryset with optimized queries.
-
-        Args:
-            request: Django admin request object
-
-        Returns:
-            Optimized queryset with select_related for user
-        """
+        """Get queryset with optimized queries."""
         return super().get_queryset(request).select_related('user')
 
 
@@ -57,12 +50,5 @@ class OrderItemAdmin(admin.ModelAdmin):
     readonly_fields = ('total',)
 
     def get_queryset(self, request) -> QuerySet[OrderItem]:
-        """Get queryset with optimized queries.
-
-        Args:
-            request: Django admin request object
-
-        Returns:
-            Optimized queryset with select_related for order and product
-        """
+        """Get queryset with optimized queries."""
         return super().get_queryset(request).select_related('order', 'product')

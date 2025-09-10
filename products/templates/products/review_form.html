@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+    <main class="page-product">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="product-details-section">
+                        <h2>Write a Review</h2>
+                        
+                        <div class="product-info-review">
+                            <img src="{% if product.image %}{{ product.image.url }}{% endif %}" 
+                                 alt="{{ product.name }}" class="product-info-review__image">
+                            <div>
+                                <h3 class="product-info-review__title">{{ product.name }}</h3>
+                                <p class="product-info-review__price">${{ product.price }}</p>
+                            </div>
+                        </div>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="InputField">
+                                <label for="{{ form.rating.id_for_label }}">
+                                    {{ form.rating.label }}
+                                </label>
+                                <div class="star-rating" data-rating="0">
+                                    <i class="fa-solid fa-star" data-rating="1"></i>
+                                    <i class="fa-solid fa-star" data-rating="2"></i>
+                                    <i class="fa-solid fa-star" data-rating="3"></i>
+                                    <i class="fa-solid fa-star" data-rating="4"></i>
+                                    <i class="fa-solid fa-star" data-rating="5"></i>
+                                </div>
+                                {{ form.rating }}
+                                {% if form.rating.errors %}
+                                    <div class="error-message">
+                                        {% for error in form.rating.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="InputField">
+                                <label for="{{ form.title.id_for_label }}">
+                                    {{ form.title.label }}
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="error-message">
+                                        {% for error in form.title.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="InputField">
+                                <label for="{{ form.comment.id_for_label }}">
+                                    {{ form.comment.label }}
+                                </label>
+                                {{ form.comment }}
+                                {% if form.comment.errors %}
+                                    <div class="error-message">
+                                        {% for error in form.comment.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if form.non_field_errors %}
+                                <div class="error-message">
+                                    {% for error in form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="ButtonGroup ButtonGroup--center">
+                                <button type="submit" class="button button--primary">
+                                    Submit Review
+                                </button>
+                                <a href="{% url 'products:product-detail' product.slug %}" 
+                                   class="button button--secondary">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

@@ -1,7 +1,8 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from products.views import ProductListView, ProductDetailView
+from products.views import (ProductDetailView, ProductListView,
+                            ReviewCreateView, ReviewUpdateView)
 
 app_name = 'products'
 urlpatterns = [
@@ -11,5 +12,8 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name='product-list'),
     path('products/<slug:slug>/', ProductDetailView.as_view(),
          name='product-detail'),
-
+    path('products/<slug:slug>/review/', ReviewCreateView.as_view(),
+         name='review-create'),
+    path('products/<slug:slug>/review/<int:pk>/edit/',
+         ReviewUpdateView.as_view(), name='review-update'),
 ]

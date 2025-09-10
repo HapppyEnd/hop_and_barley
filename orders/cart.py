@@ -5,19 +5,10 @@ from products.models import Product
 
 
 class Cart:
-    """Cart management class using Django sessions.
-
-    Handles adding, removing, and updating products in the shopping cart
-    using Django's session framework. Provides methods for cart operations
-    and data validation.
-    """
+    """Cart management class using Django sessions."""
 
     def __init__(self, request: HttpRequest) -> None:
-        """Initialize cart with session data.
-
-        Args:
-            request: Django HTTP request object containing session data
-        """
+        """Initialize cart with session data."""
         self.session = request.session
         cart = self.session.get(settings.CART_SESSION_ID)
         if not cart:
@@ -28,14 +19,7 @@ class Cart:
 
     @staticmethod
     def _clean_cart_data(cart: dict[str, any]) -> None:
-        """Clean corrupted data in cart.
-
-        Removes items with missing required keys or invalid data types
-        from the cart dictionary.
-
-        Args:
-            cart: Cart dictionary to clean
-        """
+        """Clean corrupted data in cart."""
         items_to_remove = []
         for product_id, item in cart.items():
             try:
@@ -52,13 +36,7 @@ class Cart:
 
     def add(self, product: Product, quantity: int = 1,
             override_quantity: bool = False) -> None:
-        """Add product to cart or update its quantity.
-
-        Args:
-            product: Product instance to add to cart
-            quantity: Quantity to add (default: 1)
-            override_quantity: eplace existing quantity
-        """
+        """Add product to cart or update its quantity."""
         product_id = str(product.id)
         if product_id not in self.cart:
             try:
@@ -87,23 +65,14 @@ class Cart:
         self.session.modified = True
 
     def remove(self, product: Product) -> None:
-        """Remove product from cart.
-
-        Args:
-            product: Product instance to remove from cart
-        """
+        """Remove product from cart."""
         product_id = str(product.id)
         if product_id in self.cart:
             del self.cart[product_id]
             self.save()
 
     def __iter__(self) -> any:
-        """Iterate over cart items with formatted data.
-
-        Yields:
-            Dictionary containing formatted item data including
-            product_id, quantity, price, total_price, name, image, and stock
-        """
+        """Iterate over cart items with formatted data."""
         for product_id, item in self.cart.items():
             item_copy = item.copy()
             try:
@@ -125,19 +94,11 @@ class Cart:
                 continue
 
     def __len__(self) -> int:
-        """Return total number of items in cart.
-
-        Returns:
-            Total quantity of all items in cart
-        """
+        """Return total number of items in cart."""
         return sum(int(item['quantity']) for item in self.cart.values())
 
     def get_total_price(self) -> str:
-        """Calculate and return total cart price.
-
-        Returns:
-            Formatted total price string (e.g., "$25.99")
-        """
+        """Calculate and return total cart price."""
         total = 0
 
         for item in self.cart.values():
@@ -162,23 +123,12 @@ class Cart:
         self.save()
 
     def get_product_quantity(self, product_id: int | str) -> int:
-        """Get quantity of specific product in cart.
-
-        Args:
-            product_id: ID of the product to check
-
-        Returns:
-            Quantity of the product in cart, 0 if not found
-        """
+        """Get quantity of specific product in cart."""
         quantity = self.cart.get(str(product_id), {}).get('quantity', 0)
         return int(quantity) if quantity else 0
 
     def update_stock_info(self) -> None:
-        """Update stock information for all products in cart.
-
-        Updates stock quantities and removes products that no longer exist.
-        Adjusts quantities if they exceed current stock.
-        """
+        """Update stock information for all products in cart."""
         for product_id, item in self.cart.items():
             try:
                 product = Product.objects.get(id=product_id)

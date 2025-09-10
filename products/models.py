@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -28,7 +29,8 @@ class JournalizedModel(models.Model):
 class Category(JournalizedModel, SlugMixin):
     """Product category model with hierarchical structure.
 
-    Represents product categories that can have parent-child relationships.
+    Represents product categories that can have parent-child
+    relationships.
     """
     name = models.CharField(
         max_length=100,
@@ -58,12 +60,7 @@ class Category(JournalizedModel, SlugMixin):
         return self.name
 
     def save(self, *args, **kwargs) -> None:
-        """Save category with unique slug.
-
-        Args:
-            *args: Positional arguments
-            **kwargs: Keyword arguments
-        """
+        """Save category with unique slug."""
         self.generate_unique_slug(Category)
         super().save(*args, **kwargs)
 
@@ -71,8 +68,8 @@ class Category(JournalizedModel, SlugMixin):
 class Product(JournalizedModel, SlugMixin):
     """Product model with inventory and review capabilities.
 
-    Represents a product in the store with pricing, inventory, and review
-    features.
+    Represents a product in the store with pricing, inventory, and
+    review features.
     """
     name = models.CharField(
         max_length=100,
@@ -122,42 +119,30 @@ class Product(JournalizedModel, SlugMixin):
         return self.name
 
     def save(self, *args, **kwargs) -> None:
-        """Save product with unique slug.
-
-        Args:
-            *args: Positional arguments
-            **kwargs: Keyword arguments
-        """
+        """Save product with unique slug."""
         self.generate_unique_slug(Product)
         super().save(*args, **kwargs)
 
     @property
     def get_image_url(self) -> str:
-        """Return image URL or default image.
-
-        Returns:
-            Image URL or default product image path
-        """
+        """Return image URL or default image."""
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
         return '/static/img/products/default_product.png'
 
     def user_can_review(self, user) -> bool:
-        """Check if user can review this product.
-
-        Args:
-            user: User instance to check
-
-        Returns:
-            True if user can review, False otherwise
-        """
+        """Check if user can review this product."""
         if not user.is_authenticated:
             return False
+
+        # Allow admins to review any product
+        if user.is_staff:
+            return True
 
         from orders.models import OrderItem
         return OrderItem.objects.filter(
             order__user=user,
-            order__status__in=['paid', 'shipped', 'delivered'],
+            order__status='delivered',
             product=self
         ).exists()
 
@@ -192,6 +177,10 @@ class Review(JournalizedModel):
     comment = models.TextField(
         help_text="Review comment"
     )
+    created_by_admin = models.BooleanField(
+        default=False,
+        help_text="Whether this review was created by an admin"
+    )
 
     class Meta:
         verbose_name = 'Review'
@@ -203,23 +192,15 @@ class Review(JournalizedModel):
         return f'{self.user.username}: {self.rating} - {self.comment}'
 
     def clean(self) -> None:
-        """Validate that user purchased the product.
-
-        Raises:
-            ValidationError: If user hasn't purchased the product
-        """
+        """Validate that user purchased the product."""
         super().clean()
-        if not self.product.user_can_review(self.user):
-            raise ValidationError(
-                'You can only review products you have purchased.'
-            )
+        # Only validate if both product and user are set
+        if (hasattr(self, 'product') and self.product and
+                hasattr(self, 'user') and self.user):
+            if not self.product.user_can_review(self.user):
+                raise ValidationError(settings.REVIEW_DELIVERY_REQUIRED)
 
     def save(self, *args, **kwargs) -> None:
-        """Validate before saving.
-
-        Args:
-            *args: Positional arguments
-            **kwargs: Keyword arguments
-        """
+        """Validate before saving."""
         self.clean()
         super().save(*args, **kwargs)

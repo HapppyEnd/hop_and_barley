@@ -61,25 +61,14 @@ class UserRegisterForm(UserCreationForm):
         fields = ('email', 'username', 'first_name', 'last_name', 'phone',)
 
     def clean_email(self) -> str:
-        """Validate email uniqueness.
-
-        Returns:
-            Cleaned email address
-
-        Raises:
-            ValidationError: If email is already registered
-        """
+        """Validate email uniqueness."""
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email=email).exists():
             raise forms.ValidationError('Email already registered')
         return email
 
     def clean_phone(self) -> any:
-        """Validate phone number.
-
-        Returns:
-            Cleaned phone number or None
-        """
+        """Validate phone number."""
         phone = self.cleaned_data.get('phone')
         return phone
 
@@ -121,29 +110,16 @@ class UserProfileForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs) -> None:
-        """Initialize form with readonly email field.
-
-        Args:
-            *args: Positional arguments
-            **kwargs: Keyword arguments
-        """
+        """Initialize form with readonly email field."""
         super().__init__(*args, **kwargs)
         self.fields['email'].widget.attrs['readonly'] = True
 
     def clean_email(self) -> str:
-        """Ensure email cannot be changed.
-
-        Returns:
-            Current user's email address
-        """
+        """Ensure email cannot be changed."""
         return self.instance.email
 
     def clean_phone(self) -> any:
-        """Validate phone number.
-
-        Returns:
-            Cleaned phone number or None
-        """
+        """Validate phone number."""
         phone = self.cleaned_data.get('phone')
         if phone:
             return phone
@@ -154,12 +130,7 @@ class CustomPasswordChangeForm(PasswordChangeForm):
     """Custom password change form with better styling."""
 
     def __init__(self, *args, **kwargs) -> None:
-        """Initialize form with custom styling.
-
-        Args:
-            *args: Positional arguments
-            **kwargs: Keyword arguments
-        """
+        """Initialize form with custom styling."""
         super().__init__(*args, **kwargs)
         self.fields['old_password'].widget.attrs.update({
             'class': 'Input',
@@ -204,14 +175,7 @@ class ResetPasswordForm(forms.Form):
     )
 
     def clean(self) -> dict[str, any]:
-        """Validate password fields.
-
-        Returns:
-            Cleaned form data
-
-        Raises:
-            ValidationError: If passwords don't match or are too short
-        """
+        """Validate password fields."""
         cleaned_data = super().clean()
         new_password1 = cleaned_data.get('new_password1')
         new_password2 = cleaned_data.get('new_password2')

@@ -1,6 +1,12 @@
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg, Q, QuerySet
-from django.views.generic import DetailView, ListView
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from products.forms import ReviewForm
 from products.models import Category, Product, Review
 
 
@@ -11,11 +17,7 @@ class ProductListView(ListView):
     paginate_by = 3
 
     def get_queryset(self) -> QuerySet[Product]:
-        """Get filtered and sorted product queryset.
-
-        Returns:
-            QuerySet of active products with applied filters and sorting
-        """
+        """Get filtered and sorted product queryset."""
         queryset = Product.objects.filter(is_active=True).select_related(
             'category')
 
@@ -48,14 +50,7 @@ class ProductListView(ListView):
         return queryset
 
     def get_context_data(self, **kwargs) -> dict[str, any]:
-        """Get context data for product list page.
-
-        Args:
-            **kwargs: Additional context data
-
-        Returns:
-            Dictionary with context data including categories and filters
-        """
+        """Get context data for product list page."""
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
 
@@ -75,29 +70,146 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
 
     def get_queryset(self) -> QuerySet[Product]:
-        """Get active product queryset.
-
-        Returns:
-            QuerySet of active products with category
-        """
+        """Get active product queryset."""
         return Product.objects.filter(is_active=True).select_related(
             'category')
 
     def get_context_data(self, **kwargs) -> dict[str, any]:
-        """Get context data for product detail page.
+        """Get context data for product detail page."""
+        from django.conf import settings
 
-        Args:
-            **kwargs: Additional context data
-
-        Returns:
-            Dictionary with context data including reviews and cart info
-        """
         context = super().get_context_data(**kwargs)
         context['reviews'] = Review.objects.filter(
             product=self.object).select_related('user')
+
+        # Add only needed settings strings
+        context['REVIEW_ALREADY_REVIEWED'] = settings.REVIEW_ALREADY_REVIEWED
+        context['REVIEW_AFTER_DELIVERY'] = settings.REVIEW_AFTER_DELIVERY
+        context['LOGIN_TO_REVIEW'] = settings.LOGIN_TO_REVIEW
 
         from orders.cart import Cart
         cart = Cart(self.request)
         context['cart_quantity'] = cart.get_product_quantity(self.object.id)
 
+        # Check if user can review this product
+        if self.request.user.is_authenticated:
+            context['can_review'] = self.object.user_can_review(
+                self.request.user
+            )
+            user_review = Review.objects.filter(
+                product=self.object,
+                user=self.request.user
+            ).first()
+            context['has_reviewed'] = user_review is not None
+            context['user_review'] = user_review
+        else:
+            context['can_review'] = False
+            context['has_reviewed'] = False
+            context['user_review'] = None
+
+        return context
+
+
+class ReviewCreateView(LoginRequiredMixin, CreateView):
+    """View for creating product reviews."""
+    model = Review
+    form_class = ReviewForm
+    template_name = 'products/review_form.html'
+
+    def get_success_url(self):
+        """Return URL to redirect after successful review creation."""
+        return reverse(
+            'products:product-detail',
+            kwargs={'slug': self.product.slug}
+        )
+
+    def get_form_kwargs(self):
+        """Add user and product to form kwargs."""
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        kwargs['product'] = self.product
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        """Check if user can review this product before processing."""
+        # Get product once and store it
+        self.product = self.get_object()
+
+        if not self.product.user_can_review(request.user):
+            messages.error(request, settings.REVIEW_DELIVERY_REQUIRED)
+            return HttpResponseRedirect(
+                reverse(
+                    'products:product-detail',
+                    kwargs={'slug': self.product.slug}
+                )
+            )
+
+        # Check if user already reviewed this product
+        if Review.objects.filter(
+            product=self.product, user=request.user
+        ).exists():
+            messages.warning(request, settings.REVIEW_ALREADY_EXISTS)
+            return HttpResponseRedirect(
+                reverse(
+                    'products:product-detail',
+                    kwargs={'slug': self.product.slug}
+                )
+            )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        """Get the product being reviewed."""
+        from django.shortcuts import get_object_or_404
+        return get_object_or_404(Product, slug=self.kwargs['slug'])
+
+    def form_valid(self, form):
+        """Set user and product before saving."""
+        if not hasattr(self, 'product') or not self.product:
+            self.product = self.get_object()
+
+        form.instance.user = self.request.user
+        form.instance.product = self.product
+
+        messages.success(self.request, settings.REVIEW_SUCCESS_MESSAGE)
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """Add product to context."""
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        return context
+
+
+class ReviewUpdateView(UpdateView):
+    """View for updating product reviews."""
+    model = Review
+    form_class = ReviewForm
+    template_name = 'products/review_form.html'
+
+    def get_object(self):
+        """Get the review to update."""
+        from django.shortcuts import get_object_or_404
+        return get_object_or_404(
+            Review,
+            pk=self.kwargs['pk'],
+            user=self.request.user,
+            product__slug=self.kwargs['slug']
+        )
+
+    def get_success_url(self):
+        """Redirect to product detail page after successful update."""
+        return reverse_lazy(
+            'products:product-detail',
+            kwargs={'slug': self.object.product.slug})
+
+    def form_valid(self, form):
+        """Handle successful form submission."""
+        messages.success(self.request, 'Review updated successfully!')
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """Add product to context."""
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.object.product
         return context

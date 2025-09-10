@@ -50,9 +50,5 @@ class User(AbstractUser):
 
     @property
     def full_name(self) -> str:
-        """Return the user's full name or username if not available.
-
-        Returns:
-            Full name (first_name + last_name) or username as fallback
-        """
+        """Return the user's full name or username if not available."""
         return f"{self.first_name} {self.last_name}".strip() or self.username

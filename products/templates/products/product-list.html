@@ -139,6 +139,21 @@
         {% if is_paginated %}
             <div class="container">
                 <div class="pagination">
+                    <!-- First page button -->
+                    {% if page_obj.number > 1 %}
+                        <a href="?{% modify_query page=1 %}"
+                           class="pagination__link pagination__link--first">
+                            <i class="fa-solid fa-angles-left"></i>
+                            <span>First</span>
+                        </a>
+                    {% else %}
+                        <span class="pagination__link pagination__link--first disabled">
+                            <i class="fa-solid fa-angles-left"></i>
+                            <span>First</span>
+                        </span>
+                    {% endif %}
+
+                    <!-- Previous page button -->
                     {% if page_obj.has_previous %}
                         <a href="?{% modify_query page=page_obj.previous_page_number %}"
                            class="pagination__link pagination__link--prev">
@@ -152,6 +167,7 @@
                         </span>
                     {% endif %}
 
+                    <!-- Page numbers -->
                     <div class="pagination-list">
                         {% for num in page_obj.paginator.page_range %}
                             {% if page_obj.number == num %}
@@ -163,6 +179,7 @@
                         {% endfor %}
                     </div>
 
+                    <!-- Next page button -->
                     {% if page_obj.has_next %}
                         <a href="?{% modify_query page=page_obj.next_page_number %}"
                            class="pagination__link pagination__link--next">
@@ -173,6 +190,20 @@
                         <span class="pagination__link pagination__link--next disabled">
                             <span>Next</span>
                             <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    {% endif %}
+
+                    <!-- Last page button -->
+                    {% if page_obj.number < page_obj.paginator.num_pages %}
+                        <a href="?{% modify_query page=page_obj.paginator.num_pages %}"
+                           class="pagination__link pagination__link--last">
+                            <span>Last</span>
+                            <i class="fa-solid fa-angles-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="pagination__link pagination__link--last disabled">
+                            <span>Last</span>
+                            <i class="fa-solid fa-angles-right"></i>
                         </span>
                     {% endif %}
                 </div>

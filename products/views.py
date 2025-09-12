@@ -82,7 +82,6 @@ class ProductDetailView(DetailView):
         context['reviews'] = Review.objects.filter(
             product=self.object).select_related('user')
 
-        # Add only needed settings strings
         context['REVIEW_ALREADY_REVIEWED'] = settings.REVIEW_ALREADY_REVIEWED
         context['REVIEW_AFTER_DELIVERY'] = settings.REVIEW_AFTER_DELIVERY
         context['LOGIN_TO_REVIEW'] = settings.LOGIN_TO_REVIEW
@@ -132,7 +131,6 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         """Check if user can review this product before processing."""
-        # Get product once and store it
         self.product = self.get_object()
 
         if not self.product.user_can_review(request.user):

@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body>
+<div class="page-wrapper">
 <!-- Messages -->
 {% if messages %}
 <div class="messages-container">
@@ -48,9 +49,9 @@
             <ul>
                 <li><a href="{% url 'products:product-list' %}">Products</a></li>
                 <li><a href="{% url 'products:guides_recipes' %}">Guides & Recipes</a></li>
-                <li><a href="#">Community</a></li>
-                <li><a href="#">Resources</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="{% url 'products:community' %}">Community</a></li>
+                <li><a href="{% url 'products:resources' %}">Resources</a></li>
+                <li><a href="{% url 'products:contact' %}">Contact</a></li>
             </ul>
         </nav>
 
@@ -99,11 +100,11 @@
          alt="Hop & Barley Hops Logo" class="footer__hops-logo">
     <nav class="footer__nav">
         <ul>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Community</a></li>
-            <li><a href="#">Resources</a></li>
-            <li><a href="#">License</a></li>
+            <li><a href="{% url 'products:contact' %}">Contact</a></li>
+            <li><a href="{% url 'products:faq' %}">FAQ</a></li>
+            <li><a href="{% url 'products:community' %}">Community</a></li>
+            <li><a href="{% url 'products:resources' %}">Resources</a></li>
+            <li><a href="{% url 'products:license' %}">License</a></li>
         </ul>
     </nav>
     <p class="footer__copyright">© Hop & Barley 2025. All rights reserved</p>
@@ -111,5 +112,6 @@
 
 <!-- Link to your main JavaScript file -->
 <script src="{% static 'js/main.js' %}"></script>
+</div>
 </body>
 </html>

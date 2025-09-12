@@ -167,6 +167,10 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    min-height: 100vh;
+}
+
+.page-wrapper {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -994,6 +998,8 @@ footer {
     align-items: center;
     gap: var(--spacing-lg);
     margin-top: auto;
+    position: relative;
+    z-index: 1;
 }
 
 .footer__hops-logo {
@@ -3429,26 +3435,29 @@ body.user-logged-in .header__user-actions {
 .static-page-wrapper {
     background-color: var(--background-grey);
     padding: 80px 0;
-    min-height: 60vh; /* Минимальная высота, чтобы футер не прилипал к хедеру */
-    display: flex;
-    align-items: center;
+    min-height: 80vh; /* Минимальная высота, чтобы футер не прилипал к хедеру */
+    position: relative;
+    z-index: 1;
+    flex: 1;
 }
 
 .static-page-content {
     max-width: 800px;
     margin: 0 auto;
-    text-align: center;
+    text-align: left;
     background-color: white;
     padding: 60px;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
+
 .static-page-title {
     font-size: 48px;
     font-weight: 700;
     color: var(--black-main);
     margin-bottom: 8px;
+    text-align: center;
 }
 
 .static-page-subtitle {
@@ -3456,6 +3465,7 @@ body.user-logged-in .header__user-actions {
     font-weight: 600;
     color: var(--green);
     margin-bottom: 32px;
+    text-align: center;
 }
 
 .static-page-text {
@@ -3471,6 +3481,11 @@ body.user-logged-in .header__user-actions {
 .static-page-content .button {
     height: 44px;
     padding: 0 32px;
+    display: inline-block;
+    width: auto;
+    text-align: center;
+    line-height: 44px;
+    vertical-align: middle;
 }
 
 /* Base Card Component */

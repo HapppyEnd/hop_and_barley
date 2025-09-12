@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Main Content -->
+<main class="static-page-wrapper">
+  <div class="container">
+    <div class="static-page-content">
+      <h1 class="static-page-title">Community</h1>
+      <p class="static-page-subtitle">Join Our Brewing Community</p>
+      <div class="static-page-text">
+        <p>Connect with fellow homebrewers, share recipes, get advice, and celebrate the art of brewing together. Our community is built by brewers, for brewers.</p>
+        
+        <h3>Community Features</h3>
+        <p><strong>Recipe Sharing</strong><br>
+        Share your favorite recipes and discover new ones from our community. Rate and review recipes, and get feedback on your creations.</p>
+        
+        <p><strong>Brewing Forums</strong><br>
+        Ask questions, share experiences, and learn from experienced brewers. Our forums cover everything from beginner basics to advanced techniques.</p>
+        
+        <p><strong>Monthly Challenges</strong><br>
+        Participate in our monthly brewing challenges. Each month features a different style or technique to explore and master.</p>
+        
+        <p><strong>Local Meetups</strong><br>
+        Find and join local brewing groups in your area. Share beers, swap ingredients, and learn from each other in person.</p>
+        
+        <h3>Upcoming Events</h3>
+        <p><strong>Brewing Basics Workshop</strong><br>
+        March 15, 2025 - 2:00 PM<br>
+        Learn the fundamentals of homebrewing with our expert team. Perfect for beginners!</p>
+        
+        <p><strong>IPA Recipe Competition</strong><br>
+        March 20-30, 2025<br>
+        Submit your best IPA recipe and compete for prizes. Winners get featured in our recipe collection!</p>
+        
+        <p><strong>Yeast Management Seminar</strong><br>
+        April 5, 2025 - 3:00 PM<br>
+        Deep dive into yeast health, propagation, and storage techniques with our brewing experts.</p>
+        
+        <h3>Community Guidelines</h3>
+        <p>To ensure a positive experience for everyone, please follow these guidelines:</p>
+        <ul>
+          <li>Be respectful and constructive in all interactions</li>
+          <li>Share knowledge and help fellow brewers learn</li>
+          <li>Keep discussions focused on brewing and related topics</li>
+          <li>Respect intellectual property and give credit where due</li>
+          <li>Report any inappropriate behavior to our moderators</li>
+        </ul>
+        
+        <h3>Get Involved</h3>
+        <p>Ready to join our community? Here's how to get started:</p>
+        <p><strong>1. Create Your Account</strong><br>
+        Sign up for a free account to access all community features</p>
+        
+        <p><strong>2. Introduce Yourself</strong><br>
+        Post in our introductions forum and tell us about your brewing journey</p>
+        
+        <p><strong>3. Start Participating</strong><br>
+        Join discussions, share recipes, and connect with other brewers</p>
+      </div>
+      <a href="{% url 'products:product-list' %}" class="button button--primary">Back to Products</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

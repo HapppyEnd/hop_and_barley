@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Main Content -->
+<main class="static-page-wrapper">
+  <div class="container">
+    <div class="static-page-content">
+      <h1 class="static-page-title">Frequently Asked Questions</h1>
+      <p class="static-page-subtitle">Find answers to common questions</p>
+      <div class="static-page-text">
+        <h3>Ordering & Shipping</h3>
+        <p><strong>How long does shipping take?</strong><br>
+        Standard shipping takes 3-5 business days within the continental US. Express shipping (1-2 days) is available for an additional fee. International shipping varies by location.</p>
+        
+        <p><strong>Do you ship internationally?</strong><br>
+        Yes! We ship to most countries worldwide. International shipping rates and delivery times vary by destination. Please contact us for specific rates to your location.</p>
+        
+        <p><strong>What if my order is damaged during shipping?</strong><br>
+        We'll replace any damaged items at no cost to you. Please contact us within 48 hours of delivery with photos of the damage, and we'll send replacements immediately.</p>
+        
+        <h3>Products & Ingredients</h3>
+        <p><strong>How should I store my hops and yeast?</strong><br>
+        Hops should be stored in the freezer in their original packaging or vacuum-sealed bags. Liquid yeast should be refrigerated, while dry yeast can be stored in the refrigerator or freezer.</p>
+        
+        <p><strong>What's the shelf life of your ingredients?</strong><br>
+        Hops: 2-3 years when properly stored frozen. Liquid yeast: 4-6 months refrigerated. Dry yeast: 2+ years when stored properly. Malt: 1-2 years in cool, dry conditions.</p>
+        
+        <p><strong>Do you offer bulk discounts?</strong><br>
+        Yes! We offer volume discounts for orders over 10 pounds of hops or 50 pounds of malt. Contact us for custom pricing on large orders.</p>
+        
+        <h3>Brewing Support</h3>
+        <p><strong>Can you help me create a recipe?</strong><br>
+        Absolutely! Our brewing team loves helping customers develop recipes. Email us at brewing@hopandbarley.com with your style preferences and we'll work with you to create the perfect recipe.</p>
+        
+        <p><strong>What if I'm not happy with my beer?</strong><br>
+        We want you to love your homebrew! If you're not satisfied with the results, contact us and we'll help troubleshoot the issue and provide guidance for your next batch.</p>
+        
+        <p><strong>Do you offer brewing classes?</strong><br>
+        Yes! We regularly host brewing workshops and classes. Check our Community page for upcoming events, or contact us to schedule a private session.</p>
+        
+        <h3>Account & Returns</h3>
+        <p><strong>How do I create an account?</strong><br>
+        Click the "Register" button in the top right corner and fill out the simple registration form. You'll be able to track orders, save recipes, and access exclusive content.</p>
+        
+        <p><strong>What's your return policy?</strong><br>
+        We accept returns within 30 days of purchase for unopened products. Opened ingredients cannot be returned for safety reasons, but we'll work with you to resolve any issues.</p>
+        
+        <p><strong>How do I track my order?</strong><br>
+        Once your order ships, you'll receive a tracking number via email. You can also log into your account to view order status and tracking information.</p>
+      </div>
+      <a href="{% url 'products:product-list' %}" class="button button--primary">Back to Products</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

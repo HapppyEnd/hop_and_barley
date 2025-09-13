@@ -8,9 +8,16 @@ from products.models import Category, Product
 
 
 class Command(BaseCommand):
+    """Django management command to load products from JSON file into database.
+    
+    This command reads product and category data from a JSON file and creates
+    corresponding database records. It supports clearing existing data and
+    provides detailed feedback on the loading process.
+    """
     help = 'Load products from JSON file into database'
 
     def add_arguments(self, parser):
+        """Add command line arguments for the load_products command."""
         parser.add_argument(
             '--json-file',
             type=str,
@@ -24,6 +31,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        """Main command handler that loads products from JSON file."""
         json_file = options['json_file']
         clear_existing = options['clear']
 
@@ -44,7 +52,8 @@ class Command(BaseCommand):
         categories_data = data.get('categories', [])
         products_data = data.get('products', [])
 
-        self.stdout.write(f'Found {len(categories_data)} categories and {len(products_data)} products')
+        self.stdout.write(
+            f'Found {len(categories_data)} categories and {len(products_data)} products')
 
         # Create categories
         category_objects = {}
@@ -54,10 +63,6 @@ class Command(BaseCommand):
                 defaults={'name': category_name}
             )
             category_objects[category_name] = category
-            if created:
-                self.stdout.write(f'Created category: {category_name}')
-            else:
-                self.stdout.write(f'Using existing category: {category_name}')
 
         # Create products
         created_count = 0
@@ -72,7 +77,7 @@ class Command(BaseCommand):
                     )
                     continue
 
-                product = Product.objects.create(
+                Product.objects.create(
                     name=product_data['name'],
                     description=product_data['description'],
                     category=category,
@@ -82,13 +87,15 @@ class Command(BaseCommand):
                     is_active=True
                 )
                 created_count += 1
-                self.stdout.write(f'Created product: {product.name} (${product.price})')
-                
+
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f'Error creating product {product_data["name"]}: {str(e)}')
+                    self.style.ERROR(
+                        f'Error creating product {product_data["name"]}: {str(e)}')
                 )
 
         self.stdout.write(
-            self.style.SUCCESS(f'Successfully created {created_count} products')
+            self.style.SUCCESS(
+                f'Successfully created {created_count} products')
         )
+

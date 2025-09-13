@@ -11,8 +11,6 @@ class SlugMixin:
             slug = slugify(getattr(self, text_field))
             original_slug = slug
             counter = 1
-
-            # Get the object's ID if it exists (for existing objects)
             obj_id = getattr(self, 'id', None)
 
             while model_class.objects.filter(**{slug_field: slug}).exclude(

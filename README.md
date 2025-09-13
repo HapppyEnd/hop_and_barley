@@ -1,1 +1,1 @@
-# hop_and_barley
+# Hop & Barley - Online Store

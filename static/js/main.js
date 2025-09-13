@@ -74,7 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 1. Sort Options Logic
         const sortButtons = document.querySelectorAll('.sort-options .sort-button');
+        console.log('Found sort buttons:', sortButtons.length); // Отладка
+        
         sortButtons.forEach(button => {
+            console.log('Button data-sort:', button.dataset.sort); // Отладка
+            
             button.addEventListener('click', function() {
                 const sortValue = this.dataset.sort;
                 console.log('Sort button clicked:', sortValue); // Отладка
@@ -94,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Submitting form with sort:', sortValue); // Отладка
                     console.log('Form action:', mainFilterForm.action); // Отладка
                     console.log('Form method:', mainFilterForm.method); // Отладка
+                    console.log('Form data before submit:', new FormData(mainFilterForm)); // Отладка
                     mainFilterForm.submit();
                 } else {
                     console.error('Main filter form not found!'); // Отладка

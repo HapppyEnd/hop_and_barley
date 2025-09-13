@@ -1,16 +1,17 @@
 import os
 from pathlib import Path
 
+import dj_database_url
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me-in-production')
 
-DEBUG = os.getenv('DEBUG')
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,12 +58,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database configuration
+# Check if we're in Docker by looking for Docker environment variable
+is_docker = os.getenv('DOCKER_CONTAINER') == 'true'
+database_url = os.getenv('DATABASE_URL')
+
+if is_docker and database_url:
+    # Docker - use DATABASE_URL
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Local development - use SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -106,10 +122,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -131,7 +148,9 @@ SESSION_SAVE_EVERY_REQUEST = False
 # Cart settings
 CART_SESSION_ID = 'cart'
 
-# Business logic constants
+# Pagination settings
+PRODUCTS_PER_PAGE = 9
+
 # Order statuses
 ORDER_STATUS_PENDING = 'pending'
 ORDER_STATUS_PLACED = 'placed'
@@ -159,11 +178,6 @@ CANCELLABLE_STATUSES = [
 # Payment methods
 PAYMENT_METHOD_CARD = 'card'
 PAYMENT_METHOD_CASH_ON_DELIVERY = 'cash_on_delivery'
-
-PAYMENT_METHOD_CHOICES = (
-    (PAYMENT_METHOD_CARD, 'Credit/Debit Card'),
-    (PAYMENT_METHOD_CASH_ON_DELIVERY, 'Cash on Delivery'),
-)
 
 # Payment method display names
 PAYMENT_DISPLAY_NAMES = {
@@ -297,8 +311,7 @@ TITLE_PLACEHOLDER = 'Review title (optional)'
 COMMENT_PLACEHOLDER = 'Write your review here...'
 
 # Email settings
-# For development, use file backend to save emails to files
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.filebased.EmailBackend')
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 # For production, uncomment and configure:

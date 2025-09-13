@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Avg, Q, QuerySet
+from django.db.models import Avg, F, Q, QuerySet
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -14,7 +14,7 @@ class ProductListView(ListView):
     """View for displaying product list with filtering and sorting."""
     template_name = 'products/product-list.html'
     context_object_name = 'products'
-    paginate_by = 3
+    paginate_by = settings.PRODUCTS_PER_PAGE
 
     def get_queryset(self) -> QuerySet[Product]:
         """Get filtered and sorted product queryset."""
@@ -32,6 +32,9 @@ class ProductListView(ListView):
                 Q(description__icontains=search_query)
             )
 
+        # Always annotate avg_rating for display
+        queryset = queryset.annotate(avg_rating=Avg('reviews__rating'))
+
         sort_by = self.request.GET.get('sort', 'newest')
 
         if sort_by == 'price_asc':
@@ -39,9 +42,11 @@ class ProductListView(ListView):
         elif sort_by == 'price_desc':
             queryset = queryset.order_by('-price')
         elif sort_by == 'popularity':
-            queryset = queryset.annotate(
-                avg_rating=Avg('reviews__rating')
-            ).order_by('-avg_rating', '-created_at')
+            # Сначала продукты с рейтингами (по убыванию), потом без рейтингов
+            queryset = queryset.order_by(
+                F('avg_rating').desc(nulls_last=True),
+                '-created_at'
+            )
         elif sort_by == 'newest':
             queryset = queryset.order_by('-created_at')
         else:

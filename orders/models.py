@@ -53,7 +53,7 @@ class Order(models.Model):
         """Return total order amount as formatted string."""
         total = self.items.aggregate(total=Sum(
             F('price') * F('quantity')))['total'] or 0
-        return f"${total}"
+        return f"${total:.2f}"
 
     def reduce_stock(self) -> None:
         """Reduce product stock when order is confirmed."""
@@ -138,4 +138,4 @@ class OrderItem(models.Model):
         """Return total item cost (price × quantity) as formatted string."""
         if self.price is None or self.quantity is None:
             return "$0.00"
-        return f"${self.price * self.quantity}"
+        return f"${(self.price * self.quantity):.2f}"

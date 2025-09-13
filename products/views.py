@@ -32,7 +32,6 @@ class ProductListView(ListView):
                 Q(description__icontains=search_query)
             )
 
-        # Always annotate avg_rating for display
         queryset = queryset.annotate(avg_rating=Avg('reviews__rating'))
 
         sort_by = self.request.GET.get('sort', 'newest')
@@ -42,7 +41,6 @@ class ProductListView(ListView):
         elif sort_by == 'price_desc':
             queryset = queryset.order_by('-price')
         elif sort_by == 'popularity':
-            # Сначала продукты с рейтингами (по убыванию), потом без рейтингов
             queryset = queryset.order_by(
                 F('avg_rating').desc(nulls_last=True),
                 '-created_at'
@@ -95,7 +93,6 @@ class ProductDetailView(DetailView):
         cart = Cart(self.request)
         context['cart_quantity'] = cart.get_product_quantity(self.object.id)
 
-        # Check if user can review this product
         if self.request.user.is_authenticated:
             context['can_review'] = self.object.user_can_review(
                 self.request.user
@@ -147,7 +144,6 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
                 )
             )
 
-        # Check if user already reviewed this product
         if Review.objects.filter(
             product=self.product, user=request.user
         ).exists():

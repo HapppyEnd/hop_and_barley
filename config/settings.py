@@ -218,6 +218,11 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = False
 
+# CSRF settings for Docker
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access for AJAX
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']
+
 # Cart settings
 CART_SESSION_ID = 'cart'
 
@@ -382,6 +387,47 @@ COMMENT_LABEL = 'Your Review'
 # Review form placeholders
 TITLE_PLACEHOLDER = 'Review title (optional)'
 COMMENT_PLACEHOLDER = 'Write your review here...'
+
+# Product category specifications
+CATEGORY_SPECIFICATIONS = {
+    'Malt': {
+        'type': 'Specialty Malt',
+        'usage': 'Typically 3-15% of the grist',
+        'recommended_styles': 'Pale Ale, Amber Ale, IPA, Brown Ale, Porter'
+    },
+    'Hops': {
+        'type': 'Aroma/Flavor Hop',
+        'usage': 'Late boil additions and dry hopping',
+        'recommended_styles': 'Pale Ale, IPA, American Wheat, Saison'
+    },
+    'Yeast': {
+        'type': 'Ale Yeast',
+        'usage': 'Primary fermentation',
+        'recommended_styles': 'American Ales, IPAs, Wheat Beers'
+    },
+    'Beer Kits': {
+        'type': 'Complete Brewing Kit',
+        'usage': 'All ingredients for one batch',
+        'recommended_styles': 'Beginner to Intermediate difficulty'
+    },
+    'Equipment': {
+        'type': 'Brewing Equipment',
+        'usage': 'Essential brewing tools and hardware',
+        'recommended_styles': 'All beer styles'
+    },
+    'Additives': {
+        'type': 'Brewing Additive',
+        'usage': 'Enhance flavor, clarity, or stability',
+        'recommended_styles': 'Various styles depending on additive'
+    }
+}
+
+# Default specifications for unknown categories
+DEFAULT_CATEGORY_SPECIFICATIONS = {
+    'type': 'Brewing Ingredient',
+    'usage': 'Check product description for details',
+    'recommended_styles': 'Contact us for specific brewing recommendations'
+}
 
 # Email settings
 EMAIL_BACKEND = os.getenv(

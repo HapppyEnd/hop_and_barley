@@ -33,7 +33,7 @@
                                 <label for="quantity" class="form-label">Quantity:</label>
                                 <div class="quantity-selector-product">
                                     <button type="button" class="quantity-btn-product quantity-btn-minus" 
-                                            onclick="changeQuantity(-1, {{ product.stock }}, event)"
+                                            onclick="changeQuantity(-1, '{{ product.stock }}', event);"
                                             data-max="{{ product.stock }}">
                                         <i class="fas fa-minus"></i>
                                     </button>
@@ -41,7 +41,7 @@
                                            value="1" min="1" max="{{ product.stock }}" 
                                            class="quantity-input-product">
                                     <button type="button" class="quantity-btn-product quantity-btn-plus" 
-                                            onclick="changeQuantity(1, {{ product.stock }}, event)"
+                                            onclick="changeQuantity(1, '{{ product.stock }}', event);"
                                             data-max="{{ product.stock }}">
                                         <i class="fas fa-plus"></i>
                                     </button>
@@ -69,27 +69,20 @@
             <section class="accordion-section">
                 <div class="accordion-item">
                     <div class="accordion-title">
-                        <h3>Technical Specifications</h3>
+                        <h3>Product Information</h3>
                         <i class="fa-solid fa-chevron-down accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
                         <ul>
-                            <li><strong>Origin:</strong> USA / Belgium</li>
-                            <li><strong>Type:</strong> Crystal/Caramel Malt
-                            </li>
-                            <li><strong>Color (°L):</strong> 60 °L</li>
-                            <li><strong>Moisture:</strong> 5.0% max</li>
-                            <li><strong>Extract FG, Dry:</strong> 75%</li>
-                            <li><strong>Flavor Profile:</strong> Sweet,
-                                caramel, toffee, hints of toasted bread
-                            </li>
-                            <li><strong>Usage:</strong> Typically 3-15% of the
-                                grist
-                            </li>
-                            <li><strong>Recommended Beer Styles:</strong> Pale
-                                Ale, Amber Ale, IPA, Brown Ale, Porter, Stout,
-                                Scotch Ale
-                            </li>
+                            <li><strong>Category:</strong> {{ product.category.name }}</li>
+                            <li><strong>Price:</strong> ${{ product.price }}</li>
+                            <li><strong>Stock:</strong> {{ product.stock }} units available</li>
+                            <li><strong>Status:</strong> {% if product.is_active %}Available{% else %}Out of Stock{% endif %}</li>
+                            {% with specs=product.category.get_specifications %}
+                                <li><strong>Type:</strong> {{ specs.type }}</li>
+                                <li><strong>Usage:</strong> {{ specs.usage }}</li>
+                                <li><strong>Recommended Styles:</strong> {{ specs.recommended_styles }}</li>
+                            {% endwith %}
                         </ul>
                     </div>
                 </div>
@@ -137,7 +130,9 @@
                             {% endfor %}
                         </div>
                         <div class="review-body">
-                            <h4 class="review-heading">{{ review.title }}</h4>
+                            {% if review.title %}
+                                <h4 class="review-heading">{{ review.title }}</h4>
+                            {% endif %}
                             <p class="review-text">{{ review.comment }}</p>
 
                         </div>

@@ -36,5 +36,9 @@ else:
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
+echo "Creating media directories..."
+mkdir -p /app/media/product_images
+mkdir -p /app/media/profile_image
+
 echo "Starting server..."
 exec "$@"

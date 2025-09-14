@@ -64,6 +64,14 @@ class Category(JournalizedModel, SlugMixin):
         self.generate_unique_slug(Category)
         super().save(*args, **kwargs)
 
+    def get_specifications(self) -> dict:
+        """Get category-specific specifications."""
+        from django.conf import settings
+        return settings.CATEGORY_SPECIFICATIONS.get(
+            self.name,
+            settings.DEFAULT_CATEGORY_SPECIFICATIONS
+        )
+
 
 class Product(JournalizedModel, SlugMixin):
     """Product model with inventory and review capabilities.

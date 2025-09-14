@@ -119,6 +119,18 @@
           <h2 class="account-form-title">Personal Info</h2>
           
           <div class="account-info-display">
+            <div class="info-item profile-image-item">
+              <label>Profile Photo:</label>
+              <div class="profile-image-container">
+                {% if user.image %}
+                  <img src="{{ user.image.url }}" alt="Profile Photo" class="profile-image">
+                {% else %}
+                  <div class="profile-image-default">
+                    {{ user.username|first|upper }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
             <div class="info-item">
               <label>Full Name:</label>
               <span>{{ user.full_name|default:"Not set" }}</span>
@@ -261,6 +273,38 @@
   text-align: right;
   flex: 1;
   margin-left: 1rem;
+}
+
+.profile-image-item {
+  align-items: center !important;
+}
+
+.profile-image-container {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.profile-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+}
+
+.profile-image-default {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  border: 2px solid #e0e0e0;
 }
 
 .account-actions {

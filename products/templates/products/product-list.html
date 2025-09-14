@@ -114,7 +114,7 @@
                                         <h4 class="product-card__name">{{ product.name }}</h4>
                                         <p class="product-card__price">
                                             ${{ product.price }}</p>
-                                        <p class="product-card__description">{{ product.description|truncatechars:70 }}</p>
+                                        <p class="product-card__description">{{ product.description|truncatechars:50 }}</p>
 
                                         <div class="product-rating">
                                             {% with avg_rating=product.reviews.all|avg_rating %}

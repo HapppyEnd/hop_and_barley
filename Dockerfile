@@ -19,12 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
-RUN chmod +x /app/entrypoint.sh
-
-RUN mkdir -p /app/media
+RUN mkdir -p /app/media /app/staticfiles
 
 EXPOSE 8000
 
-ENTRYPOINT ["/app/entrypoint.sh"]
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py shell -c \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123') if not User.objects.filter(username='admin').exists() else None\" && python manage.py shell -c \"from products.models import Product; import subprocess; subprocess.run(['python', 'manage.py', 'load_products', '--json-file', 'products_data.json'], check=False) if Product.objects.count() == 0 else None\" && python manage.py runserver 0.0.0.0:8000"]

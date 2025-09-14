@@ -86,9 +86,8 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = [
-            'first_name', 'last_name', 'email', 'phone', 'city', 'address'
-        ]
+        fields = ('first_name', 'last_name', 'email', 'phone', 'city',
+                  'address', 'image')
         widgets = {
             'first_name': forms.TextInput(
                 attrs={'class': 'Input', 'placeholder': 'First Name'}
@@ -106,6 +105,9 @@ class UserProfileForm(forms.ModelForm):
                 attrs={
                     'class': 'Textarea', 'placeholder': 'Address', 'rows': 3
                 }
+            ),
+            'image': forms.FileInput(
+                attrs={'class': 'Input', 'accept': 'image/*'}
             ),
         }
 

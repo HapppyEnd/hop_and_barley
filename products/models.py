@@ -1,6 +1,4 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -140,7 +138,7 @@ class Product(JournalizedModel, SlugMixin):
 
     def user_can_review(self, user) -> bool:
         """Check if user can review this product."""
-        if not user.is_authenticated:
+        if not user or not user.is_authenticated:
             return False
 
         # Allow admins to review any product
@@ -199,16 +197,6 @@ class Review(JournalizedModel):
     def __str__(self) -> str:
         return f'{self.user.username}: {self.rating} - {self.comment}'
 
-    def clean(self) -> None:
-        """Validate that user purchased the product."""
-        super().clean()
-        # Only validate if both product and user are set
-        if (hasattr(self, 'product') and self.product and
-                hasattr(self, 'user') and self.user):
-            if not self.product.user_can_review(self.user):
-                raise ValidationError(settings.REVIEW_DELIVERY_REQUIRED)
-
     def save(self, *args, **kwargs) -> None:
-        """Validate before saving."""
-        self.clean()
+        """Save review."""
         super().save(*args, **kwargs)

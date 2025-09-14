@@ -265,7 +265,6 @@ header {
     gap: var(--spacing-md);
 }
 
-/* User Actions */
 .header__user-actions {
     display: flex;
     align-items: center;
@@ -318,7 +317,6 @@ header {
     background-color: var(--slate-200);
 }
 
-/* Shared small button styles */
 .button--small {
     padding: 6px 12px;
     font-size: 12px;
@@ -363,7 +361,6 @@ header {
     border-color: var(--dark-green);
 }
 
-/* Button in flex container */
 .button--flex-item {
     flex: 0 0 auto !important;
     min-width: 150px;
@@ -371,7 +368,6 @@ header {
     padding: 12px 24px;
 }
 
-/* Reviews section header */
 .reviews-header {
     display: flex;
     justify-content: space-between;
@@ -381,7 +377,6 @@ header {
     gap: 1rem;
 }
 
-/* Review status messages */
 .review-status {
     display: flex;
     align-items: center;
@@ -402,7 +397,6 @@ header {
     color: #6c757d;
 }
 
-/* Product info in review form */
 .product-info-review {
     display: flex;
     align-items: center;
@@ -430,7 +424,6 @@ header {
     font-weight: 600;
 }
 
-/* Star rating styles */
 .star-rating {
     display: flex;
     gap: 4px;
@@ -453,7 +446,6 @@ header {
     color: #ddd;
 }
 
-/* User Reviews Page */
 .reviews-list {
     display: flex;
     flex-direction: column;
@@ -593,14 +585,6 @@ header {
     margin-right: auto;
 }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-}
 
 .pagination-info {
     padding: 0.5rem 1rem;
@@ -608,7 +592,6 @@ header {
     font-size: 0.875rem;
 }
 
-/* Header Reviews Link */
 .reviews-link {
     display: flex;
     align-items: center;
@@ -635,7 +618,6 @@ header {
 }
 
 
-/* Hero Banner */
 .hero-banner {
     position: relative;
     max-width: 1312px;
@@ -645,13 +627,6 @@ header {
     padding: 0 var(--spacing-5xl);
 }
 
-/*.hero-banner {*/
-/*    position: relative;*/
-/*    width: 100%;*/
-/*    height: 400px;*/
-/*    overflow: hidden;*/
-/*    margin-bottom: 32px;*/
-/*}*/
 
 .hero-banner__image {
     width: 100%;
@@ -672,7 +647,6 @@ header {
     z-index: 1000;
 }
 
-/* Main Content Grid */
 .main-content-grid {
     display: grid;
     grid-template-columns: 304px 1fr;
@@ -681,7 +655,6 @@ header {
     padding-bottom: var(--spacing-5xl);
 }
 
-/* Sidebar */
 .sidebar {
     padding: var(--spacing-lg);
     background-color: var(--background-default);
@@ -730,7 +703,6 @@ header {
     font-size: var(--font-size-sm);
 }
 
-/* Custom Checkboxes */
 .checkbox-group {
     width: 100%;
     display: flex;
@@ -791,7 +763,6 @@ header {
     display: block;
 }
 
-/* Search & Sort Bar */
 .search-sort-bar {
     width: 100%;
     display: flex;
@@ -860,7 +831,6 @@ header {
     color: var(--white-text);
 }
 
-/* Product Grid */
 .product-grid {
     width: 100%;
     display: grid;
@@ -917,16 +887,15 @@ header {
     font-size: var(--font-size-base);
     line-height: 1.4;
     color: var(--grey-text);
-    height: 2.8em; /* Ограничиваем высоту до 2 строк */
+    height: 2.8em;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
-    /* Fallback для старых браузеров */
     text-overflow: ellipsis;
 }
 
-/* Pagination */
 .pagination {
     width: 100%;
     margin-top: var(--spacing-4xl);
@@ -992,13 +961,11 @@ header {
     padding: var(--spacing-sm) var(--spacing-md);
 }
 
-/* Main content wrapper */
 main {
     flex: 1;
     width: 100%;
 }
 
-/* Footer */
 footer {
     width: 100%;
     padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md) var(--spacing-xl);
@@ -1054,17 +1021,11 @@ footer {
     color: var(--white-text);
 }
 
-/* Link wrapper for product cards */
 .product-card-link {
     text-decoration: none;
 }
 
 
-/*
-========================================
-    Register Page Specific Styles
-========================================
-*/
 .auth-page-wrapper {
     position: relative;
     width: 100%;
@@ -1143,7 +1104,6 @@ footer {
     width: 100%;
 }
 
-/* Special styles for account edit page */
 .auth-page-wrapper .auth-container--account-edit {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -1157,7 +1117,6 @@ footer {
     line-height: 1.3;
 }
 
-/* Shared help text styles */
 .help-text {
     display: block;
     font-size: 12px;
@@ -1166,7 +1125,6 @@ footer {
     line-height: 1.3;
 }
 
-/* Shared auth links styles */
 .auth-links {
     margin-top: 16px;
     text-align: center;
@@ -1191,7 +1149,6 @@ footer {
     margin: 0;
 }
 
-/* Account Edit Page - Standard Form */
 .account-edit-page {
     max-width: 600px;
     margin: 40px auto;
@@ -1278,7 +1235,7 @@ footer {
 }
 
 .InputField {
-    width: 100%; /* 368px */
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -1485,11 +1442,6 @@ footer {
 }
 
 
-/*
-========================================
-    Login Page Specific Styles
-========================================
-*/
 
 /* Common auth container styles */
 .auth-container--login,
@@ -1529,11 +1481,6 @@ footer {
 }
 
 
-/*
-========================================
-    Forgot Password Page Specific Styles
-========================================
-*/
 
 .ButtonGroup--center {
     width: 100%;
@@ -1560,11 +1507,6 @@ footer {
 }
 
 
-/*
-========================================
-    Header User Actions (Logged-in state)
-========================================
-*/
 .header__user-actions {
     display: flex !important;
     align-items: center;
@@ -1607,11 +1549,6 @@ footer {
     padding: 8px 16px;
 }
 
-/*
-========================================
-    Logic for Hiding/Showing Auth Blocks
-========================================
-*/
 
 body:not(.user-logged-in) .header__user-actions {
     display: none;
@@ -1628,11 +1565,6 @@ body.user-logged-in .header__user-actions {
 }
 
 
-/*
-========================================
-    Product Detail Page Styles
-========================================
-*/
 .page-product {
     background-color: var(--background-grey);
     padding: 64px 0;
@@ -1645,7 +1577,6 @@ body.user-logged-in .header__user-actions {
     margin-bottom: 0;
 }
 
-/* --- Product Details Section --- */
 .product-details-section {
     display: flex;
     gap: 32px;
@@ -1716,7 +1647,6 @@ body.user-logged-in .header__user-actions {
     gap: 1em;
 }
 
-/*  Add to Cart" Button  */
 .add-to-cart-button {
     width: 304px;
     height: 40px;
@@ -1738,7 +1668,6 @@ body.user-logged-in .header__user-actions {
     display: inline-block;
 }
 
-/* --- Accordion Section  --- */
 
 .accordion-item {
     width: 640px;
@@ -1793,7 +1722,6 @@ body.user-logged-in .header__user-actions {
     transform: rotate(180deg);
 }
 
-/* --- Reviews Section --- */
 .reviews-section {
     display: flex;
     flex-direction: column;
@@ -1869,11 +1797,6 @@ body.user-logged-in .header__user-actions {
     color: var(--grey-text);
 }
 
-/*
-========================================
-    Cart Controls & Quantity Counter
-========================================
-*/
 .cart-controls {
     width: 304px;
     height: 40px;
@@ -1919,11 +1842,6 @@ body.user-logged-in .header__user-actions {
     color: var(--dark-green);
 }
 
-/*
-========================================
-    Shopping Cart Page Styles
-========================================
-*/
 .cart-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px 0;
@@ -2085,7 +2003,6 @@ body.user-logged-in .header__user-actions {
     -moz-appearance: textfield;
 }
 
-/* Product page quantity selector */
 .quantity-selector-product {
     display: flex;
     align-items: center;
@@ -2171,7 +2088,6 @@ body.user-logged-in .header__user-actions {
     color: #c81e1e;
 }
 
-/* Cart Summary */
 .cart-summary {
     display: flex;
     flex-direction: column;
@@ -2196,17 +2112,11 @@ body.user-logged-in .header__user-actions {
     padding: 12px;
 }
 
-/*
-========================================
-    Checkout Page Styles
-========================================
-*/
 .checkout-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px 0;
 }
 
-/* Payment Methods */
 .payment-methods {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2335,7 +2245,6 @@ body.user-logged-in .header__user-actions {
     resize: vertical;
 }
 
-/* Payment Method Radio Buttons */
 .payment-options {
     display: flex;
     flex-direction: column;
@@ -2396,7 +2305,6 @@ body.user-logged-in .header__user-actions {
     color: #1e1e1e;
 }
 
-/* Order Summary */
 .checkout-summary {
     background-color: var(--background-green);
     padding: 24px;
@@ -2430,11 +2338,6 @@ body.user-logged-in .header__user-actions {
     padding: 12px;
 }
 
-/*
-========================================
-    Account Page Styles
-========================================
-*/
 .account-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px 0;
@@ -2448,7 +2351,6 @@ body.user-logged-in .header__user-actions {
     gap: 32px;
 }
 
-/* Tabs Navigation */
 .account-tabs {
     display: flex;
     border-bottom: 1px solid var(--border-default);
@@ -2477,7 +2379,6 @@ body.user-logged-in .header__user-actions {
     border-bottom-color: var(--black-main);
 }
 
-/* Tabs Content */
 .tab-pane {
     display: none;
 }
@@ -2486,18 +2387,17 @@ body.user-logged-in .header__user-actions {
     display: block;
 }
 
-/* Order History Table */
 .order-history-table {
     width: 100%;
     background-color: var(--background-default);
     border-radius: 16px;
     border: 1px solid var(--border-default);
-    overflow: hidden; /* To clip corners of header */
+    overflow: hidden;
 }
 
 .order-table-header {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr; /* 3-column layout */
+    grid-template-columns: 2fr 1fr 1fr;
     background-color: var(--background-green);
     font-weight: 700;
 }
@@ -2516,13 +2416,11 @@ body.user-logged-in .header__user-actions {
     gap: 10px;
 }
 
-/* Shared order date styles */
 .order-date {
     color: var(--grey-text);
     font-size: 16px;
 }
 
-/* Order Filters */
 .order-filters {
     background-color: var(--background-default);
     border: 1px solid var(--border-default);
@@ -2620,8 +2518,6 @@ body.user-logged-in .header__user-actions {
     font-size: 14px;
 }
 
-/* Status Badge Improvements */
-/* Shared order status styles */
 .order-status {
     display: inline-block;
     padding: var(--spacing-sm) var(--spacing-md);
@@ -2669,7 +2565,6 @@ body.user-logged-in .header__user-actions {
     border: 1px solid var(--status-placed-border);
 }
 
-/* Pagination for Account Page */
 .account-pagination {
     margin-top: 24px;
     padding: 24px;
@@ -2681,11 +2576,6 @@ body.user-logged-in .header__user-actions {
     align-items: center;
 }
 
-/*
-========================================
-    Order Detail Page Styles
-========================================
-*/
 .order-details-section {
     padding: 32px 0;
 }
@@ -2890,11 +2780,6 @@ body.user-logged-in .header__user-actions {
     gap: 8px;
 }
 
-/*
-========================================
-    Order List Page Styles
-========================================
-*/
 .orders-page {
     padding: 32px 0;
 }
@@ -3021,7 +2906,6 @@ body.user-logged-in .header__user-actions {
     margin-bottom: 24px;
 }
 
-/* Responsive Design for Order Pages */
 @media (max-width: 768px) {
     .order-content {
         grid-template-columns: 1fr;
@@ -3072,11 +2956,6 @@ body.user-logged-in .header__user-actions {
 }
 
 
-/*
-========================================
-    Account Information Form Styles
-========================================
-*/
 .account-form-container {
     padding: 24px;
     background-color: var(--background-default);
@@ -3108,11 +2987,6 @@ body.user-logged-in .header__user-actions {
 }
 
 
-/*
-========================================
-    Admin Panel Styles
-========================================
-*/
 .admin-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px;
@@ -3126,7 +3000,6 @@ body.user-logged-in .header__user-actions {
     gap: 32px;
 }
 
-/* Tabs Navigation */
 .admin-tabs {
     display: flex;
     border-bottom: 1px solid var(--border-default);
@@ -3155,7 +3028,6 @@ body.user-logged-in .header__user-actions {
     border-bottom-color: var(--black-main);
 }
 
-/* Admin Content */
 .admin-content {
     display: flex;
     flex-direction: column;
@@ -3181,7 +3053,6 @@ body.user-logged-in .header__user-actions {
     gap: 8px;
 }
 
-/* Admin Table */
 .admin-table-wrapper {
     width: 100%;
     border: 1px solid var(--border-default);
@@ -3229,11 +3100,6 @@ body.user-logged-in .header__user-actions {
     border-radius: 8px;
 }
 
-/*
-========================================
-    Admin Add/Edit Product Page Styles
-========================================
-*/
 .admin-form-layout {
     display: grid;
     grid-template-columns: 208px 1fr;
@@ -3242,7 +3108,6 @@ body.user-logged-in .header__user-actions {
     width: 100%;
 }
 
-/* Левая колонка */
 .admin-form-col-left {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
@@ -3251,7 +3116,6 @@ body.user-logged-in .header__user-actions {
     gap: 24px;
 }
 
-/* Правая колонка */
 .admin-form-col-right {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
@@ -3260,7 +3124,6 @@ body.user-logged-in .header__user-actions {
     gap: 24px;
 }
 
-/* Кнопки внизу */
 .admin-form-actions {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
@@ -3273,7 +3136,6 @@ body.user-logged-in .header__user-actions {
     font-weight: 600;
 }
 
-/* Карточка загрузки изображения */
 .image-upload-card {
     width: 208px;
     height: 272px;
@@ -3316,7 +3178,6 @@ body.user-logged-in .header__user-actions {
     width: 100%;
 }
 
-/* Сategory */
 .category-tags {
     display: flex;
     gap: 8px;
@@ -3349,13 +3210,11 @@ body.user-logged-in .header__user-actions {
     display: inline-block;
 }
 
-/* Save, Hide, Delete */
 .admin-form-actions .button {
     height: 40px;
     padding: 12px 24px;
 }
 
-/* Shared danger button styles */
 .button--danger {
     background-color: #dc3545;
     color: white;
@@ -3372,11 +3231,6 @@ body.user-logged-in .header__user-actions {
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
 }
 
-/*
-========================================
-    Admin Dashboard Page Styles
-========================================
-*/
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -3438,15 +3292,10 @@ body.user-logged-in .header__user-actions {
     color: #ff3b30;
 }
 
-/*
-========================================
-    Static Content Page Styles
-========================================
-*/
 .static-page-wrapper {
     background-color: var(--background-grey);
     padding: 80px 0;
-    min-height: 80vh; /* Минимальная высота, чтобы футер не прилипал к хедеру */
+    min-height: 80vh;
     position: relative;
     z-index: 1;
     flex: 1;
@@ -3499,7 +3348,6 @@ body.user-logged-in .header__user-actions {
     vertical-align: middle;
 }
 
-/* Base Card Component */
 .card {
     background-color: var(--background-default);
     border: 1px solid var(--border-default);
@@ -3514,7 +3362,6 @@ body.user-logged-in .header__user-actions {
     border-radius: var(--radius-xl);
 }
 
-/* Base Form Component */
 .form-input {
     width: 100%;
     padding: var(--spacing-md) var(--spacing-lg);
@@ -3538,7 +3385,6 @@ body.user-logged-in .header__user-actions {
     border-color: var(--border-dark-grey);
 }
 
-/* Base Button Sizes */
 .btn-sm {
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: var(--font-size-base);
@@ -3557,7 +3403,6 @@ body.user-logged-in .header__user-actions {
     height: 44px;
 }
 
-/* Base Status Colors */
 .text-success { color: var(--success-color); }
 .text-info { color: var(--info-color); }
 .text-warning { color: var(--warning-color); }
@@ -3570,7 +3415,6 @@ body.user-logged-in .header__user-actions {
 .bg-danger { background-color: var(--danger-bg); }
 .bg-error { background-color: var(--error-bg); }
 
-/* Utility Classes */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
@@ -3624,7 +3468,6 @@ body.user-logged-in .header__user-actions {
 .inline-block { display: inline-block; }
 .inline-flex { display: inline-flex; }
 
-/* Admin Dashboard Stat Card Icon Variants */
 .stat-card__icon-wrapper--success {
     background-color: var(--success-bg);
 }
@@ -3657,7 +3500,6 @@ body.user-logged-in .header__user-actions {
     color: var(--danger-color);
 }
 
-/* Дополнительные стили для фильтров */
 .price-range {
     display: flex;
     align-items: center;
@@ -3719,7 +3561,6 @@ body.user-logged-in .header__user-actions {
     font-size: 18px;
 }
 
-/* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
     .main-content-grid {
         grid-template-columns: 1fr;
@@ -3746,7 +3587,6 @@ body.user-logged-in .header__user-actions {
     }
 }
 
-/* Payment Form Styles */
 .card-payment-form {
     margin-top: 20px;
     padding: 20px;
@@ -3866,7 +3706,6 @@ body.user-logged-in .header__user-actions {
     line-height: 1.5;
 }
 
-/* Payment method selection */
 .payment-methods {
     display: flex;
     flex-direction: column;
@@ -3928,7 +3767,6 @@ body.user-logged-in .header__user-actions {
     font-size: 12px;
 }
 
-/* Responsive design for payment form */
 @media (max-width: 768px) {
     .card-form-grid {
         grid-template-columns: 1fr;
@@ -3956,7 +3794,6 @@ body.user-logged-in .header__user-actions {
     }
 }
 
-/* Order Actions */
 
 .order-actions {
     display: flex;
@@ -3970,7 +3807,6 @@ body.user-logged-in .header__user-actions {
 }
 
 
-/* Status Info Cards */
 .status-info-card {
     display: flex;
     align-items: flex-start;
@@ -4057,7 +3893,6 @@ body.user-logged-in .header__user-actions {
     color: #dc3545;
 }
 
-/* Responsive styles for account edit form */
 @media (max-width: 768px) {
     .auth-container--account-edit {
         width: 90vw;

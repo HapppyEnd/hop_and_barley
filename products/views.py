@@ -169,6 +169,7 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
 
         form.instance.user = self.request.user
         form.instance.product = self.product
+        form.instance.created_by_admin = self.request.user.is_staff
 
         messages.success(self.request, settings.REVIEW_SUCCESS_MESSAGE)
         return super().form_valid(form)

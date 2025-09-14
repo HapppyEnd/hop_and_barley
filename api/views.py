@@ -222,6 +222,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().prefetch_related('items__product')
     serializer_class = OrderSerializer
     permission_classes = (IsAuthenticated, IsOwnerOrAdminOrReadOnly)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filterset_fields = ('status',)
+    ordering_fields = ('created_at', 'total_price')
     ordering = ('-created_at',)
 
     def get_queryset(self):

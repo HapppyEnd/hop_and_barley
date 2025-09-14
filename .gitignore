@@ -142,7 +142,7 @@ dmypy.json
 Thumbs.db
 
 # Media files (if needed to be ignored)
-# media/
+media/
 
 # Static files (if needed to be ignored)
 staticfiles/

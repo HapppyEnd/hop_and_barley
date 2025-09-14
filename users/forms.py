@@ -123,8 +123,6 @@ class UserProfileForm(forms.ModelForm):
     def clean_phone(self) -> any:
         """Validate phone number."""
         phone = self.cleaned_data.get('phone')
-        if phone:
-            return phone
         return phone
 
 

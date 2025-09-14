@@ -45,14 +45,28 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     """Serializer for Product model."""
     category = CategorySerializer(read_only=True)
+    category_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Product
         fields = (
-            'id', 'name', 'slug', 'description', 'category',
+            'id', 'name', 'slug', 'description', 'category', 'category_id',
             'price', 'image', 'get_image_url', 'is_active', 'stock'
         )
         read_only_fields = ('id', 'slug', 'get_image_url')
+
+    def create(self, validated_data):
+        """Create product with category_id."""
+        category_id = validated_data.pop('category_id')
+        validated_data['category_id'] = category_id
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """Update product with category_id."""
+        if 'category_id' in validated_data:
+            category_id = validated_data.pop('category_id')
+            validated_data['category_id'] = category_id
+        return super().update(instance, validated_data)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

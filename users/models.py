@@ -10,7 +10,7 @@ class User(AbstractUser):
     and adds profile information like phone, image, city, and address.
     """
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', ]
+    REQUIRED_FIELDS = ('username',)
 
     email = models.EmailField(
         unique=True,

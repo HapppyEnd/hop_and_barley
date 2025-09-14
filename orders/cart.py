@@ -37,6 +37,9 @@ class Cart:
     def add(self, product: Product, quantity: int = 1,
             override_quantity: bool = False) -> None:
         """Add product to cart or update its quantity."""
+        if quantity <= 0:
+            return  # Don't add items with zero or negative quantity
+            
         product_id = str(product.id)
         if product_id not in self.cart:
             try:
@@ -120,6 +123,7 @@ class Cart:
     def clear(self) -> None:
         """Remove cart from session."""
         del self.session[settings.CART_SESSION_ID]
+        self.cart = {}
         self.save()
 
     def get_product_quantity(self, product_id: int | str) -> int:

@@ -407,7 +407,9 @@ def cancel_order(request: HttpRequest, order_id: int) -> HttpResponse:
         messages.error(
             request, settings.ORDER_MESSAGES['ORDER_CANNOT_BE_CANCELED']
         )
-        return redirect('orders:order_detail', order_id=order_id)
+        return render(request, 'orders/order_detail.html', {
+            'order': order
+        }, status=400)
 
     if request.method == 'POST':
         try:

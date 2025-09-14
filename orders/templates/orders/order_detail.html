@@ -40,7 +40,7 @@
                             {% if item.product.image %}
                                 <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
                             {% else %}
-                                <img src="{% static 'img/products/caramel_malt.jpg' %}" alt="{{ item.product.name }}">
+                                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
                             {% endif %}
                         </div>
                         <div class="order-item-info">

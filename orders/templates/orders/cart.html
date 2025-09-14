@@ -15,7 +15,7 @@
         {% if item.image %}
           <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-item__image">
         {% else %}
-          <img src="{% static 'img/products/caramel_malt.jpg' %}" alt="{{ item.name }}" class="cart-item__image">
+          <img src="{{ item.get_image_url }}" alt="{{ item.name }}" class="cart-item__image">
         {% endif %}
         <div class="cart-item__body">
           <div class="cart-item__details">

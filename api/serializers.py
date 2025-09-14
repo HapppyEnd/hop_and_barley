@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema_field
+from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -27,6 +29,17 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('id', 'name', 'slug', 'parent')
         read_only_fields = ('id', 'slug')
+
+    def to_representation(self, instance):
+        """Add nested parent data."""
+        data = super().to_representation(instance)
+        if instance.parent:
+            data['parent'] = {
+                'id': instance.parent.id,
+                'name': instance.parent.name,
+                'slug': instance.parent.slug
+            }
+        return data
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -87,6 +100,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model."""
+    phone = extend_schema_field(serializers.CharField(
+        help_text="Phone number in international format (e.g., +1234567890)"
+    ))(PhoneNumberField(required=False, allow_null=True))
 
     class Meta:
         model = user_model
@@ -101,6 +117,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     """Serializer for user registration with password fields."""
     password = serializers.CharField(write_only=True)
     password_confirm = serializers.CharField(write_only=True)
+    phone = extend_schema_field(serializers.CharField(
+        help_text="Phone number in international format (e.g., +1234567890)"
+    ))(PhoneNumberField(required=False, allow_null=True))
 
     class Meta:
         model = user_model
@@ -116,3 +135,34 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if data['password'] != data['password_confirm']:
             raise serializers.ValidationError("Passwords don't match.")
         return data
+
+
+class CartItemSerializer(serializers.Serializer):
+    """Serializer for session-based cart items."""
+    product_id = serializers.IntegerField(read_only=True)
+    product = ProductSerializer(read_only=True)
+    quantity = serializers.IntegerField(read_only=True)
+    total_price = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    stock = serializers.IntegerField(read_only=True)
+
+
+class CartSerializer(serializers.Serializer):
+    """Serializer for session-based cart."""
+    items = CartItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+    items_count = serializers.SerializerMethodField()
+
+    def get_total_price(self, obj):
+        """Get total cart price from session cart."""
+        cart = obj.get('cart_instance')
+        if cart:
+            return cart.get_total_price()
+        return "$0.00"
+
+    def get_items_count(self, obj):
+        """Get total number of items in cart."""
+        cart = obj.get('cart_instance')
+        if cart:
+            return len(cart)
+        return 0

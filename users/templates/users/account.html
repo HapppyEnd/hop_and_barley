@@ -165,7 +165,7 @@
                 <div class="review-item">
                   <div class="review-item__header">
                     <div class="review-item__product">
-                      <img src="{% if review.product.image %}{{ review.product.image.url }}{% else %}{% static 'img/products/default_product.png' %}{% endif %}" 
+                      <img src="{% if review.product.image %}{{ review.product.image.url }}{% else %}{{ review.product.get_image_url }}{% endif %}" 
                            alt="{{ review.product.name }}" class="review-item__image">
                       <div class="review-item__product-info">
                         <h3 class="review-item__product-name">

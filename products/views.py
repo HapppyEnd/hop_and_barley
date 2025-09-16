@@ -33,11 +33,8 @@ class ProductListView(ListView):
                 Q(name__icontains=search_query) |
                 Q(description__icontains=search_query)
             )
-
         queryset = queryset.annotate(avg_rating=Avg('reviews__rating'))
-
         sort_by = self.request.GET.get('sort', 'newest')
-
         if sort_by == 'price_asc':
             queryset = queryset.order_by('price')
         elif sort_by == 'price_desc':
@@ -51,19 +48,16 @@ class ProductListView(ListView):
             queryset = queryset.order_by('-created_at')
         else:
             queryset = queryset.order_by('-created_at')
-
         return queryset
 
     def get_context_data(self, **kwargs) -> dict[str, any]:
         """Get context data for product list page."""
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
-
         context['selected_categories'] = self.request.GET.getlist('category',
                                                                   [])
         context['search_query'] = self.request.GET.get('search', '')
         context['sort_by'] = self.request.GET.get('sort', 'newest')
-
         return context
 
 
@@ -81,7 +75,6 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs) -> dict[str, any]:
         """Get context data for product detail page."""
-        from django.conf import settings
 
         context = super().get_context_data(**kwargs)
         context['reviews'] = Review.objects.filter(
@@ -139,7 +132,6 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         """Check if user can review this product before processing."""
         self.product = self.get_object()
-
         if not self.product.user_can_review(request.user):
             messages.error(request, settings.REVIEW_DELIVERY_REQUIRED)
             return HttpResponseRedirect(

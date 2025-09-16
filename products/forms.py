@@ -40,19 +40,12 @@ class ReviewForm(forms.ModelForm):
     def clean(self):
         """Validate that user can review this product."""
         cleaned_data = super().clean()
-
-        # Get user from form context or request_user (for admin)
         user = getattr(self, 'request_user', None) or self.user
-
-        # Skip validation if no user or product (admin case)
         if not user or not self.product:
             return cleaned_data
-
-        # Debug information
         print(f"User: {user}, is_staff: {user.is_staff}, "
               f"can_review: {self.product.user_can_review(user)}")
 
-        # Allow admins to review any product
         if not user.is_staff and not self.product.user_can_review(user):
             raise forms.ValidationError(settings.REVIEW_DELIVERY_REQUIRED)
 

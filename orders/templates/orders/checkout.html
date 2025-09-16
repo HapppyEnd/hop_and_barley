@@ -17,7 +17,9 @@
                     <label for="shipping_address">Shipping address</label>
                     {% if user.city or user.address %}
                     <div class="address-autofill">
-                        <button type="button" id="autofill-address" class="button button--secondary button--small">
+                        <button type="button" id="autofill-address" class="button button--secondary button--small"
+                                data-city="{{ user.city|default:'' }}" 
+                                data-address="{{ user.address|default:'' }}">
                             <i class="fas fa-map-marker-alt"></i> Use my saved address
                         </button>
                     </div>
@@ -67,7 +69,7 @@
                         <div class="form-group">
                             <label for="card_holder">Cardholder Name</label>
                             <input type="text" id="card_holder" name="card_holder" 
-                                   placeholder="John Doe" maxlength="50">
+                                   placeholder="John Doe" maxlength="50" pattern="[a-zA-Z\s\-']{2,50}">
                         </div>
                         <div class="form-group">
                             <label for="expiry_date">Expiry Date</label>
@@ -78,7 +80,7 @@
                         <div class="form-group">
                             <label for="cvv">CVV</label>
                             <input type="text" id="cvv" name="cvv" 
-                                   placeholder="123" maxlength="4" pattern="[0-9]{3,4}">
+                                   placeholder="123" maxlength="3" pattern="[0-9]{3}">
                         </div>
                     </div>
                     <div class="payment-note">
@@ -129,205 +131,4 @@
     </div>
 </main>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Address autofill functionality
-    const autofillButton = document.getElementById('autofill-address');
-    const addressTextarea = document.getElementById('shipping_address');
-    
-    if (autofillButton && addressTextarea) {
-        autofillButton.addEventListener('click', function() {
-            // Get user's saved address data
-            const userCity = '{{ user.city|default:"" }}';
-            const userAddress = '{{ user.address|default:"" }}';
-            
-            // Combine city and address
-            let fullAddress = '';
-            if (userAddress) {
-                fullAddress = userAddress;
-            }
-            if (userCity) {
-                if (fullAddress) {
-                    fullAddress += ', ' + userCity;
-                } else {
-                    fullAddress = userCity;
-                }
-            }
-            
-            // Fill the textarea
-            if (fullAddress) {
-                addressTextarea.value = fullAddress;
-                // Add visual feedback
-                autofillButton.innerHTML = '<i class="fas fa-check"></i> Address filled!';
-                autofillButton.classList.add('button--success');
-                setTimeout(() => {
-                    autofillButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Use my saved address';
-                    autofillButton.classList.remove('button--success');
-                }, 2000);
-            }
-        });
-    }
-
-    // Payment method switching
-    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
-    const cardForm = document.getElementById('card-payment-form');
-    const cashInfo = document.getElementById('cash-payment-info');
-    
-    function togglePaymentForms() {
-        const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
-        
-        if (selectedMethod === 'card') {
-            cardForm.style.display = 'block';
-            cashInfo.style.display = 'none';
-        } else {
-            cardForm.style.display = 'none';
-            cashInfo.style.display = 'block';
-        }
-    }
-    
-    // Add event listeners to payment method radio buttons
-    paymentMethods.forEach(method => {
-        method.addEventListener('change', togglePaymentForms);
-    });
-    
-    // Initialize form visibility
-    togglePaymentForms();
-
-    // Card number formatting
-    const cardNumberInput = document.getElementById('card_number');
-    if (cardNumberInput) {
-        cardNumberInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            if (formattedValue.length <= 19) {
-                e.target.value = formattedValue;
-            }
-        });
-    }
-
-    // Expiry date formatting and validation
-    const expiryInput = document.getElementById('expiry_date');
-    const expiryError = document.getElementById('expiry_error');
-    
-    if (expiryInput) {
-        expiryInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
-            }
-            e.target.value = value;
-            
-            // Clear error state when user starts typing
-            e.target.classList.remove('error');
-            if (expiryError) {
-                expiryError.style.display = 'none';
-            }
-        });
-        
-        // Validate on blur
-        expiryInput.addEventListener('blur', function(e) {
-            const value = e.target.value.trim();
-            if (value && value.length === 5) {
-                if (!validateCardExpiry(value)) {
-                    e.target.classList.add('error');
-                    if (expiryError) {
-                        expiryError.style.display = 'block';
-                    }
-                } else {
-                    e.target.classList.remove('error');
-                    if (expiryError) {
-                        expiryError.style.display = 'none';
-                    }
-                }
-            }
-        });
-    }
-
-    // CVV formatting (numbers only)
-    const cvvInput = document.getElementById('cvv');
-    if (cvvInput) {
-        cvvInput.addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
-    }
-
-    function validateCardExpiry(expiryDate) {
-        try {
-            if (!expiryDate || expiryDate.length !== 5 || expiryDate[2] !== '/') {
-                return false;
-            }
-            
-            const [month, year] = expiryDate.split('/');
-            
-            if (!/^\d{2}$/.test(month) || !/^\d{2}$/.test(year)) {
-                return false;
-            }
-            
-            const monthNum = parseInt(month);
-            const yearNum = parseInt('20' + year);
-            
-            if (monthNum < 1 || monthNum > 12) {
-                return false;
-            }
-            
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1;
-            
-            if (yearNum < currentYear || (yearNum === currentYear && monthNum < currentMonth)) {
-                return false;
-            }
-            
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    const checkoutForm = document.getElementById('checkout-form');
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
-            const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
-            
-            if (selectedMethod === 'card') {
-                const cardNumber = document.getElementById('card_number').value;
-                const cardHolder = document.getElementById('card_holder').value;
-                const expiryDate = document.getElementById('expiry_date').value;
-                const cvv = document.getElementById('cvv').value;
-                
-                if (!cardNumber || !cardHolder || !expiryDate || !cvv) {
-                    e.preventDefault();
-                    alert('{{ settings.ORDER_MESSAGES.CARD_DETAILS_REQUIRED }}');
-                    return;
-                }
-                
-                const cleanCardNumber = cardNumber.replace(/\s/g, '');
-                if (cleanCardNumber.length < 13 || cleanCardNumber.length > 19) {
-                    e.preventDefault();
-                    alert('{{ settings.ORDER_MESSAGES.CARD_NUMBER_LENGTH }}');
-                    return;
-                }
-                
-                if (!validateCardExpiry(expiryDate)) {
-                    e.preventDefault();
-                    alert('{{ settings.ORDER_MESSAGES.CARD_EXPIRED }}');
-                    return;
-                }
-                
-                if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-                    e.preventDefault();
-                    alert('{{ settings.ORDER_MESSAGES.CARD_INVALID_FORMAT }}');
-                    return;
-                }
-                
-                if (cvv.length < 3 || cvv.length > 4) {
-                    e.preventDefault();
-                    alert('{{ settings.ORDER_MESSAGES.CARD_CVV_INVALID }}');
-                    return;
-                }
-            }
-        });
-    }
-});
-</script>
 {% endblock %}

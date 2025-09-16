@@ -1442,6 +1442,34 @@ footer {
     background-color: var(--slate-200);
 }
 
+.button--back {
+    background-color: transparent;
+    color: var(--black-main);
+    font-weight: 500;
+    border: 1px solid var(--border-dark-grey);
+}
+
+.button--back:hover {
+    background-color: var(--slate-200);
+}
+
+.button--secondary,
+.button--back,
+.button--cancel {
+    background-color: transparent !important;
+    color: var(--black-main) !important;
+    border: 1px solid var(--border-dark-grey) !important;
+    padding: 10px 20px !important;
+    height: 40px !important;
+    min-width: 120px !important;
+}
+
+.button--secondary:hover,
+.button--back:hover,
+.button--cancel:hover {
+    background-color: var(--slate-200) !important;
+}
+
 
 .header__user-actions {
     display: flex !important;
@@ -2658,12 +2686,32 @@ body.user-logged-in .header__user-actions {
 
 .order-actions {
     margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .order-actions .button {
-    width: 100%;
+    width: auto;
     justify-content: center;
     gap: 8px;
+    margin: 0 5px;
+}
+
+.order-actions .button--cancel,
+.order-actions .button--back {
+    background-color: transparent !important;
+    color: var(--black-main) !important;
+    border: 1px solid var(--border-dark-grey) !important;
+    padding: 10px 20px !important;
+    height: 40px !important;
+    min-width: 120px !important;
+    width: auto !important;
+}
+
+.order-actions .button--cancel:hover,
+.order-actions .button--back:hover {
+    background-color: var(--slate-200) !important;
 }
 
 .orders-page {

@@ -38,7 +38,7 @@ class Cart:
             override_quantity: bool = False) -> None:
         """Add product to cart or update its quantity."""
         if quantity <= 0:
-            return  # Don't add items with zero or negative quantity
+            return
             
         product_id = str(product.id)
         if product_id not in self.cart:

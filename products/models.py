@@ -139,11 +139,8 @@ class Product(JournalizedModel, SlugMixin):
         """Check if user can review this product."""
         if not user or not user.is_authenticated:
             return False
-
-        # Allow admins to review any product
         if user.is_staff:
             return True
-
         from orders.models import OrderItem
         return OrderItem.objects.filter(
             order__user=user,

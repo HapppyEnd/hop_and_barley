@@ -54,14 +54,12 @@ class ReviewAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         """Get form with admin user context."""
         form = super().get_form(request, obj, **kwargs)
-        # Store request user for form validation
         form.request_user = request.user
         return form
 
     def save_model(self, request, obj, form, change):
         """Save model with admin user tracking."""
-        if not change:  # Only for new reviews
-            # Mark that this review was created by admin
+        if not change:
             obj.created_by_admin = True
         super().save_model(request, obj, form, change)
 

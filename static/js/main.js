@@ -478,5 +478,240 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- Checkout Page Logic ---
+    const checkoutPageContent = document.querySelector('.checkout-page-wrapper');
+    if (checkoutPageContent) {
+        // Address autofill functionality
+        const autofillButton = document.getElementById('autofill-address');
+        const addressTextarea = document.getElementById('shipping_address');
+        
+        if (autofillButton && addressTextarea) {
+            autofillButton.addEventListener('click', function() {
+                // Get user's saved address data
+                const userCity = autofillButton.dataset.city || '';
+                const userAddress = autofillButton.dataset.address || '';
+                
+                // Combine city and address
+                let fullAddress = '';
+                if (userAddress) {
+                    fullAddress = userAddress;
+                }
+                if (userCity) {
+                    if (fullAddress) {
+                        fullAddress += ', ' + userCity;
+                    } else {
+                        fullAddress = userCity;
+                    }
+                }
+                
+                // Fill the textarea
+                if (fullAddress) {
+                    addressTextarea.value = fullAddress;
+                    // Add visual feedback
+                    autofillButton.innerHTML = '<i class="fas fa-check"></i> Address filled!';
+                    autofillButton.classList.add('button--success');
+                    setTimeout(() => {
+                        autofillButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Use my saved address';
+                        autofillButton.classList.remove('button--success');
+                    }, 2000);
+                }
+            });
+        }
+
+        // Payment method switching
+        const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+        const cardForm = document.getElementById('card-payment-form');
+        const cashInfo = document.getElementById('cash-payment-info');
+        
+        function togglePaymentForms() {
+            const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            
+            if (selectedMethod === 'card') {
+                cardForm.style.display = 'block';
+                cashInfo.style.display = 'none';
+            } else {
+                cardForm.style.display = 'none';
+                cashInfo.style.display = 'block';
+            }
+        }
+        
+        // Add event listeners to payment method radio buttons
+        paymentMethods.forEach(method => {
+            method.addEventListener('change', togglePaymentForms);
+        });
+        
+        // Initialize form visibility
+        togglePaymentForms();
+
+        // Card number formatting
+        const cardNumberInput = document.getElementById('card_number');
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                if (formattedValue.length <= 19) {
+                    e.target.value = formattedValue;
+                }
+            });
+        }
+
+        // Expiry date formatting and validation
+        const expiryInput = document.getElementById('expiry_date');
+        const expiryError = document.getElementById('expiry_error');
+        
+        if (expiryInput) {
+            expiryInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+                
+                // Clear error state when user starts typing
+                e.target.classList.remove('error');
+                if (expiryError) {
+                    expiryError.style.display = 'none';
+                }
+            });
+            
+            // Validate on blur
+            expiryInput.addEventListener('blur', function(e) {
+                const value = e.target.value.trim();
+                if (value && value.length === 5) {
+                    if (!validateCardExpiry(value)) {
+                        e.target.classList.add('error');
+                        if (expiryError) {
+                            expiryError.style.display = 'block';
+                        }
+                    } else {
+                        e.target.classList.remove('error');
+                        if (expiryError) {
+                            expiryError.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Card holder formatting (letters, spaces, hyphens, apostrophes only)
+        const cardHolderInput = document.getElementById('card_holder');
+        if (cardHolderInput) {
+            cardHolderInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^a-zA-Z\s\-']/g, '').slice(0, 50);
+            });
+        }
+
+        // CVV formatting (numbers only, max 3 digits)
+        const cvvInput = document.getElementById('cvv');
+        if (cvvInput) {
+            cvvInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
+            });
+        }
+
+        function validateCardExpiry(expiryDate) {
+            try {
+                if (!expiryDate || expiryDate.length !== 5 || expiryDate[2] !== '/') {
+                    return false;
+                }
+                
+                const [month, year] = expiryDate.split('/');
+                
+                if (!/^\d{2}$/.test(month) || !/^\d{2}$/.test(year)) {
+                    return false;
+                }
+                
+                const monthNum = parseInt(month);
+                const yearNum = parseInt('20' + year);
+                
+                if (monthNum < 1 || monthNum > 12) {
+                    return false;
+                }
+                
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1;
+                
+                if (yearNum < currentYear || (yearNum === currentYear && monthNum < currentMonth)) {
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function(e) {
+                const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+                
+                if (selectedMethod === 'card') {
+                    const cardNumber = document.getElementById('card_number').value;
+                    const cardHolder = document.getElementById('card_holder').value;
+                    const expiryDate = document.getElementById('expiry_date').value;
+                    const cvv = document.getElementById('cvv').value;
+                    
+                    if (!cardNumber || !cardHolder || !expiryDate || !cvv) {
+                        e.preventDefault();
+                        alert('Please fill in all card details');
+                        return;
+                    }
+                    
+                    const cleanCardNumber = cardNumber.replace(/\s/g, '');
+                    if (cleanCardNumber.length < 13 || cleanCardNumber.length > 19) {
+                        e.preventDefault();
+                        alert('Card number must be between 13 and 19 digits');
+                        return;
+                    }
+                    
+                    if (!/^\d+$/.test(cleanCardNumber)) {
+                        e.preventDefault();
+                        alert('Card number must contain only digits');
+                        return;
+                    }
+                    
+                    if (!validateCardExpiry(expiryDate)) {
+                        e.preventDefault();
+                        alert('Card has expired');
+                        return;
+                    }
+                    
+                    if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+                        e.preventDefault();
+                        alert('Invalid expiry date format');
+                        return;
+                    }
+                    
+                    if (cvv.length !== 3 || !/^\d{3}$/.test(cvv)) {
+                        e.preventDefault();
+                        alert('CVV must be exactly 3 digits');
+                        return;
+                    }
+                    
+                    // Validate card holder name
+                    if (cardHolder.length < 2 || cardHolder.length > 50) {
+                        e.preventDefault();
+                        alert('Card holder name must be between 2 and 50 characters');
+                        return;
+                    }
+                    
+                    if (!/^[a-zA-Z\s\-']+$/.test(cardHolder)) {
+                        e.preventDefault();
+                        alert('Card holder name can only contain letters, spaces, hyphens, and apostrophes');
+                        return;
+                    }
+                    
+                    if (!/[a-zA-Z]/.test(cardHolder)) {
+                        e.preventDefault();
+                        alert('Card holder name must contain at least one letter');
+                        return;
+                    }
+                }
+            });
+        }
+    }
+
  
  });

@@ -150,7 +150,7 @@
           <div class="account-actions">
             <a href="{% url 'users:account_edit' %}" class="button button--primary button--full-width">Edit Profile</a>
             <a href="{% url 'users:password_change' %}" class="button button--secondary button--full-width">Change Password</a>
-            <form action="{% url 'users:logout' %}" method="post" style="margin-top: 10px;">
+            <form action="{% url 'users:logout' %}" method="post" class="logout-form-inline">
               {% csrf_token %}
               <button type="submit" class="button button--secondary button--full-width">Logout</button>
             </form>
@@ -236,102 +236,5 @@
   </div>
 </main>
 
-<style>
-.account-info-display {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-}
 
-.account-info-display .info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.account-info-display .info-item:last-child {
-  border-bottom: none;
-}
-
-.account-info-display .info-item label {
-  font-weight: 600;
-  color: #2c3e50;
-  min-width: 120px;
-}
-
-.account-info-display .info-item span {
-  color: #555;
-  text-align: right;
-  flex: 1;
-  margin-left: 1rem;
-}
-
-.profile-image-item {
-  align-items: center !important;
-}
-
-.profile-image-container {
-  display: flex;
-  align-items: center;
-  margin-left: 1rem;
-}
-
-.profile-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e0e0e0;
-}
-
-.profile-image-default {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #007bff;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
-  border: 2px solid #e0e0e0;
-}
-
-.account-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.button--full-width {
-  width: 100%;
-  text-align: center;
-}
-</style>
-
-<script>
-// Tab switching functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const tabs = document.querySelectorAll('.account-tab');
-  const tabPanes = document.querySelectorAll('.tab-pane');
-  
-  tabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      const targetId = this.getAttribute('data-tab-target');
-      
-      // Remove active class from all tabs and panes
-      tabs.forEach(t => t.classList.remove('active'));
-      tabPanes.forEach(p => p.classList.remove('active'));
-      
-      // Add active class to clicked tab and corresponding pane
-      this.classList.add('active');
-      document.querySelector(targetId).classList.add('active');
-    });
-  });
-});
-</script>
 {% endblock %}

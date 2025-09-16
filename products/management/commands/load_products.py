@@ -101,12 +101,10 @@ class Command(BaseCommand):
             f'{len(products_data)} products'
         )
 
-        # Check image availability
         available_images, missing_images = self.check_images_availability(
             products_data
         )
 
-        # Create categories
         category_objects = {}
         for category_name in categories_data:
             category, created = Category.objects.get_or_create(
@@ -115,7 +113,6 @@ class Command(BaseCommand):
             )
             category_objects[category_name] = category
 
-        # Create products
         created_count = 0
         for product_data in products_data:
             try:
@@ -129,7 +126,6 @@ class Command(BaseCommand):
                     )
                     continue
 
-                # Create product without image first
                 product = Product.objects.create(
                     name=product_data['name'],
                     description=product_data['description'],
@@ -139,7 +135,6 @@ class Command(BaseCommand):
                     is_active=True
                 )
 
-                # Handle image upload
                 image_name = product_data['image_name']
                 image_path = Path('media/product_images') / image_name
 

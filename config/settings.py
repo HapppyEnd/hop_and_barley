@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'django_filters',
     'phonenumber_field',
     'users.apps.UsersConfig',
     'products.apps.ProductsConfig',
@@ -212,7 +213,7 @@ LOGOUT_REDIRECT_URL = '/products'
 
 # Session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_COOKIE_AGE = 1209600
 SESSION_COOKIE_SECURE = False  # Set to True in production
 SESSION_COOKIE_HTTPONLY = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -228,6 +229,7 @@ CART_SESSION_ID = 'cart'
 
 # Pagination settings
 PRODUCTS_PER_PAGE = 9
+ORDERS_PER_PAGE = 10
 
 # Order statuses
 ORDER_STATUS_PENDING = 'pending'

@@ -3,9 +3,11 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg, F, Q, QuerySet
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from orders.cart import Cart
 from products.forms import ReviewForm
 from products.models import Category, Product, Review
 
@@ -16,7 +18,7 @@ class ProductListView(ListView):
     context_object_name = 'products'
     paginate_by = settings.PRODUCTS_PER_PAGE
 
-    def get_queryset(self) -> QuerySet[Product]:
+    def get_queryset(self) -> QuerySet:
         """Get filtered and sorted product queryset."""
         queryset = Product.objects.filter(is_active=True).select_related(
             'category')
@@ -72,7 +74,7 @@ class ProductDetailView(DetailView):
     slug_field = 'slug'
     context_object_name = 'product'
 
-    def get_queryset(self) -> QuerySet[Product]:
+    def get_queryset(self) -> QuerySet:
         """Get active product queryset."""
         return Product.objects.filter(is_active=True).select_related(
             'category')
@@ -89,7 +91,6 @@ class ProductDetailView(DetailView):
         context['REVIEW_AFTER_DELIVERY'] = settings.REVIEW_AFTER_DELIVERY
         context['LOGIN_TO_REVIEW'] = settings.LOGIN_TO_REVIEW
 
-        from orders.cart import Cart
         cart = Cart(self.request)
         context['cart_quantity'] = cart.get_product_quantity(self.object.id)
 
@@ -117,6 +118,10 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     form_class = ReviewForm
     template_name = 'products/review_form.html'
 
+    def __init__(self, **kwargs):
+        super().__init__(kwargs)
+        self.product = None
+
     def get_success_url(self):
         """Return URL to redirect after successful review creation."""
         return reverse(
@@ -143,9 +148,8 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
                     kwargs={'slug': self.product.slug}
                 )
             )
-
         if Review.objects.filter(
-            product=self.product, user=request.user
+                product=self.product, user=request.user
         ).exists():
             messages.warning(request, settings.REVIEW_ALREADY_EXISTS)
             return HttpResponseRedirect(
@@ -154,12 +158,10 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
                     kwargs={'slug': self.product.slug}
                 )
             )
-
         return super().dispatch(request, *args, **kwargs)
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         """Get the product being reviewed."""
-        from django.shortcuts import get_object_or_404
         return get_object_or_404(Product, slug=self.kwargs['slug'])
 
     def form_valid(self, form):
@@ -187,9 +189,8 @@ class ReviewUpdateView(UpdateView):
     form_class = ReviewForm
     template_name = 'products/review_form.html'
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         """Get the review to update."""
-        from django.shortcuts import get_object_or_404
         return get_object_or_404(
             Review,
             pk=self.kwargs['pk'],

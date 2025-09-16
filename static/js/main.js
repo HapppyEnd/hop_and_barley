@@ -454,5 +454,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- Account Page Tab Switching ---
+    const accountPageContent = document.querySelector('.account-page-wrapper');
+    if (accountPageContent) {
+        const tabs = document.querySelectorAll('.account-tab');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-tab-target');
+                
+                // Remove active class from all tabs and panes
+                tabs.forEach(t => t.classList.remove('active'));
+                tabPanes.forEach(p => p.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding pane
+                this.classList.add('active');
+                const targetPane = document.querySelector(targetId);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                }
+            });
+        });
+    }
+
  
  });

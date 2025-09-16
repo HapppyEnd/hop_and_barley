@@ -265,11 +265,6 @@ header {
     gap: var(--spacing-md);
 }
 
-.header__user-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
 
 .user-icon {
     transition: opacity 0.2s ease;
@@ -304,7 +299,14 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
+    border: 1px solid var(--green);
+    background-color: var(--green);
+    color: var(--white-text);
+}
+
+.button:hover {
+    background-color: var(--dark-green);
+    border-color: var(--dark-green);
 }
 
 .button--secondary {
@@ -325,12 +327,24 @@ header {
 
 .button--success {
     background-color: var(--green);
-    color: white;
-    border-color: var(--green);
+    color: var(--white-text);
+    border: 1px solid var(--green);
 }
 
-.address-autofill {
-    margin-bottom: var(--spacing-sm);
+.button--success:hover {
+    background-color: var(--dark-green);
+    border-color: var(--dark-green);
+}
+
+.button--primary {
+    background-color: var(--green);
+    border: 1px solid var(--green);
+    color: var(--white-text);
+}
+
+.button--primary:hover {
+    background-color: var(--dark-green);
+    border-color: var(--dark-green);
 }
 
 .filter-button {
@@ -350,16 +364,6 @@ header {
     border-color: var(--dark-green);
 }
 
-.button--primary {
-    background-color: var(--green);
-    border: 1px solid var(--green);
-    color: var(--white-text);
-}
-
-.button--primary:hover {
-    background-color: var(--dark-green);
-    border-color: var(--dark-green);
-}
 
 .button--flex-item {
     flex: 0 0 auto !important;
@@ -1021,11 +1025,6 @@ footer {
     color: var(--white-text);
 }
 
-.product-card-link {
-    text-decoration: none;
-}
-
-
 .auth-page-wrapper {
     position: relative;
     width: 100%;
@@ -1044,14 +1043,6 @@ footer {
     height: 100%;
     z-index: 1;
 }
-
-.auth-background img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-
 
 .auth-form-container {
     position: relative;
@@ -1117,13 +1108,6 @@ footer {
     line-height: 1.3;
 }
 
-.help-text {
-    display: block;
-    font-size: 12px;
-    color: var(--grey-text);
-    margin-top: 4px;
-    line-height: 1.3;
-}
 
 .auth-links {
     margin-top: 16px;
@@ -1145,9 +1129,6 @@ footer {
     color: #721c24;
 }
 
-.alert p {
-    margin: 0;
-}
 
 .account-edit-page {
     max-width: 600px;
@@ -1182,23 +1163,6 @@ footer {
     margin-bottom: 6px;
 }
 
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border-default);
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: var(--background-grey);
-    transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--green);
-    box-shadow: 0 0 0 2px rgba(2, 84, 45, 0.2);
-}
 
 
 
@@ -1210,10 +1174,6 @@ footer {
     margin-top: 24px;
 }
 
-.form-actions .button {
-    padding: 10px 20px;
-    font-size: 14px;
-}
 
 .Legend {
     width: 100%;
@@ -1249,25 +1209,6 @@ footer {
 }
 
 /* Common input styles */
-.Input {
-    width: 100%;
-    height: 40px;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--background-grey);
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-md);
-    line-height: 1;
-    color: var(--black-main);
-}
-
-.Input:focus {
-    outline: none;
-    border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(2, 84, 45, 0.2);
-}
-
-/* Django form fields styling */
 .Input,
 .InputField input[type="text"],
 .InputField input[type="email"],
@@ -1423,11 +1364,6 @@ footer {
 }
 
 /* auth-switch - link "Already have an account?" */
-.auth-switch {
-    margin-top: 0;
-    font-size: 14px;
-    color: var(--grey-text);
-}
 
 .auth-switch a {
     color: var(--green);
@@ -1547,6 +1483,10 @@ footer {
     border: 1px solid var(--border-dark-grey);
     color: var(--black-main);
     padding: 8px 16px;
+}
+
+.button--logout:hover {
+    background-color: var(--slate-200);
 }
 
 
@@ -1797,10 +1737,6 @@ body.user-logged-in .header__user-actions {
     color: var(--grey-text);
 }
 
-.cart-controls {
-    width: 304px;
-    height: 40px;
-}
 
 .is-hidden {
     display: none !important;
@@ -2117,12 +2053,6 @@ body.user-logged-in .header__user-actions {
     padding: 64px 0;
 }
 
-.payment-methods {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-}
 
 .payment-option {
     position: relative;
@@ -2135,50 +2065,6 @@ body.user-logged-in .header__user-actions {
     height: 0;
 }
 
-.payment-label {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    padding: 16px;
-    background-color: var(--background);
-    border: 2px solid var(--border-default);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.payment-label > div {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.payment-label small {
-    font-size: 12px;
-    color: var(--grey-text);
-    font-weight: 400;
-    margin-left: 36px;
-}
-
-.payment-label:hover {
-    border-color: var(--green);
-    background-color: var(--background-green);
-}
-
-.payment-option input[type="radio"]:checked + .payment-label {
-    border-color: var(--green);
-    background-color: var(--background-green);
-    color: var(--green);
-}
-
-.payment-label i {
-    font-size: 20px;
-    width: 24px;
-    text-align: center;
-}
 
 .checkout-container {
     max-width: 640px;
@@ -3514,22 +3400,6 @@ body.user-logged-in .header__user-actions {
     font-size: 14px;
 }
 
-.keyword-tag {
-    display: inline-flex;
-    align-items: center;
-    background: var(--background-green);
-    color: var(--green);
-    padding: 4px 8px;
-    border-radius: 12px;
-    margin: 2px;
-    font-size: 12px;
-    gap: 4px;
-}
-
-.remove-keyword-icon {
-    cursor: pointer;
-    font-size: 10px;
-}
 
 .product-rating {
     display: flex;
@@ -3637,6 +3507,38 @@ body.user-logged-in .header__user-actions {
     outline: none;
     border-color: var(--green);
     box-shadow: 0 0 0 2px rgba(2, 84, 45, 0.1);
+}
+
+.form-group input:hover {
+    border-color: var(--border-dark-grey);
+}
+
+.form-group textarea,
+.form-group select {
+    padding: 12px;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    background-color: var(--background-grey);
+}
+
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(2, 84, 45, 0.1);
+}
+
+.form-group textarea:hover,
+.form-group select:hover {
+    border-color: var(--border-dark-grey);
+}
+
+.form-group textarea {
+    height: auto;
+    min-height: 80px;
+    resize: vertical;
 }
 
 .form-group input.error {
@@ -3795,16 +3697,6 @@ body.user-logged-in .header__user-actions {
 }
 
 
-.order-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.order-actions form {
-    margin: 0;
-}
 
 
 .status-info-card {
@@ -3926,4 +3818,107 @@ body.user-logged-in .header__user-actions {
     .auth-container--account-edit .auth-title {
         font-size: 16px;
     }
+}
+
+/* Account page styles */
+.account-info-display {
+    background: var(--background-grey);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-default);
+}
+
+.account-info-display .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.account-info-display .info-item:last-child {
+    border-bottom: none;
+}
+
+.account-info-display .info-item label {
+    font-weight: 600;
+    color: var(--black-main);
+    min-width: 120px;
+}
+
+.account-info-display .info-item span {
+    color: var(--grey-text);
+    text-align: right;
+    flex: 1;
+    margin-left: 1rem;
+}
+
+.profile-image-item {
+    align-items: center !important;
+}
+
+.profile-image-container {
+    display: flex;
+    align-items: center;
+    margin-left: 1rem;
+}
+
+.profile-image {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 2px solid var(--border-default);
+}
+
+.profile-image-default {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-full);
+    background-color: var(--green);
+    color: var(--white-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid var(--border-default);
+}
+
+.account-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.button--full-width {
+    width: 100%;
+    text-align: center;
+}
+
+.logout-form-inline {
+    margin-top: 10px;
+}
+
+/* Account edit page styles */
+.current-image {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.current-profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 2px solid var(--border-default);
+    margin-bottom: 5px;
+}
+
+.help-text {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--grey-text);
+    margin-top: 5px;
 }

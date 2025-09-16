@@ -8,10 +8,7 @@
             <!-- Product Info Section -->
             <section class="product-details-section">
                 <div class="product-image-container">
-                    <img src="
-                         {% if product.image %}
-                            {{ product.image.url }}
-                          {% endif %}"
+                    <img src="{{ product.get_image_url }}"
                          alt="{{ product.name }}" class="product-image">
                 </div>
                 <div class="product-info-column">

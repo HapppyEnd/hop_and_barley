@@ -25,7 +25,6 @@ class User(AbstractUser):
         upload_to='profile_image',
         null=True,
         blank=True,
-        default='profile_image/default.jpg',
         help_text="User's profile image"
     )
     city = models.CharField(
@@ -52,3 +51,10 @@ class User(AbstractUser):
     def full_name(self) -> str:
         """Return the user's full name or username if not available."""
         return f"{self.first_name} {self.last_name}".strip() or self.username
+
+    @property
+    def get_image_url(self) -> str:
+        """Return image URL or default image."""
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return '/static/img/users/default.jpg'

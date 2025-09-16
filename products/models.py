@@ -105,7 +105,6 @@ class Product(JournalizedModel, SlugMixin):
         upload_to='product_images',
         blank=True,
         null=True,
-        default='product_images/default.png',
         help_text="Product image"
     )
     is_active = models.BooleanField(
@@ -134,7 +133,7 @@ class Product(JournalizedModel, SlugMixin):
         """Return image URL or default image."""
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
-        return '/media/product_images/default.png'
+        return '/static/img/products/default.png'
 
     def user_can_review(self, user) -> bool:
         """Check if user can review this product."""

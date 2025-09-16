@@ -81,12 +81,10 @@
 
                 <div class="InputField">
                     <label for="{{ form.image.id_for_label }}">Profile Photo</label>
-                    {% if user.image %}
-                        <div class="current-image">
-                            <img src="{{ user.image.url }}" alt="Current profile photo" class="current-profile-image">
-                            <small class="help-text">Current profile photo</small>
-                        </div>
-                    {% endif %}
+                    <div class="current-image">
+                        <img src="{{ user.get_image_url }}" alt="Current profile photo" class="current-profile-image">
+                        <small class="help-text">Current profile photo</small>
+                    </div>
                     {{ form.image }}
                     <small class="help-text">Upload a new profile photo (optional)</small>
                     {% for error in form.image.errors %}

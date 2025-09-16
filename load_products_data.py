@@ -11,12 +11,38 @@ from decimal import Decimal
 from pathlib import Path
 
 import django
+from django.core.files import File
 
 from products.models import Category, Product
 
 sys.path.append(str(Path(__file__).parent))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
+
+
+def check_images_availability(products_data):
+    """Check which images are available in media folder."""
+    available_images = []
+    missing_images = []
+
+    for product_data in products_data:
+        image_name = product_data['image_name']
+        image_path = Path('media/product_images') / image_name
+
+        if image_path.exists():
+            available_images.append(image_name)
+        else:
+            missing_images.append(image_name)
+
+    print(f"Available images: {len(available_images)}")
+    print(f"Missing images: {len(missing_images)}")
+
+    if missing_images:
+        print("Missing images:")
+        for img in missing_images:
+            print(f"  - {img}")
+
+    return available_images, missing_images
 
 
 def load_products_from_json(json_file='products_data.json'):
@@ -36,10 +62,11 @@ def load_products_from_json(json_file='products_data.json'):
     categories_data = data.get('categories', [])
     products_data = data.get('products', [])
 
-    print(
-        f"Found {len(categories_data)} categories and {len(products_data)} products")
+    print(f"Found {len(categories_data)} categories and "
+          f"{len(products_data)} products")
 
-    # Create categories
+    available_images, missing_images = check_images_availability(products_data)
+
     category_objects = {}
     for category_name in categories_data:
         category, created = Category.objects.get_or_create(
@@ -48,25 +75,39 @@ def load_products_from_json(json_file='products_data.json'):
         )
         category_objects[category_name] = category
 
-    # Create products
     created_count = 0
     for product_data in products_data:
         try:
             category = category_objects.get(product_data['category'])
             if not category:
-                print(
-                    f"Category {product_data['category']} not found for product {product_data['name']}")
+                print(f"Category {product_data['category']} not found "
+                      f"for product {product_data['name']}")
                 continue
 
-            Product.objects.create(
+            product = Product.objects.create(
                 name=product_data['name'],
                 description=product_data['description'],
                 category=category,
                 price=Decimal(str(product_data['price'])),
-                image=f"product_images/{product_data['image_name']}",
                 stock=100,
                 is_active=True
             )
+
+            image_name = product_data['image_name']
+            image_path = Path('media/product_images') / image_name
+
+            if image_path.exists():
+                with open(image_path, 'rb') as img_file:
+                    product.image.save(
+                        image_name,
+                        File(img_file),
+                        save=True
+                    )
+                print(f"✓ Loaded image for {product_data['name']}")
+            else:
+                print(f"⚠ Image not found for {product_data['name']}: "
+                      f"{image_path}")
+
             created_count += 1
 
         except Exception as e:
@@ -77,21 +118,40 @@ def load_products_from_json(json_file='products_data.json'):
 
 def clear_existing_data():
     """Clear existing data (optional)."""
-    response = input("Clear existing data? (y/N): ")
-    if response.lower() == 'y':
+    import sys
+    if sys.stdin.isatty():
+        response = input("Clear existing data? (y/N): ")
+        if response.lower() == 'y':
+            Product.objects.all().delete()
+            Category.objects.all().delete()
+            print("Existing data cleared")
+    else:
         Product.objects.all().delete()
         Category.objects.all().delete()
-        print("Existing data cleared")
+        print("Existing data cleared (non-interactive mode)")
+
+
+def ensure_media_directories():
+    """Ensure media directories exist."""
+    media_dirs = [
+        'media',
+        'media/product_images',
+        'media/profile_image'
+    ]
+
+    for dir_path in media_dirs:
+        Path(dir_path).mkdir(parents=True, exist_ok=True)
+        print(f"✓ Ensured directory exists: {dir_path}")
 
 
 def main():
     """Main function to load product data."""
     print("Loading product data into database...")
 
-    # Optionally clear existing data
+    ensure_media_directories()
+
     clear_existing_data()
 
-    # Load data
     load_products_from_json()
 
     print("Loading completed!")

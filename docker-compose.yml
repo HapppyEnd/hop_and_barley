@@ -12,9 +12,7 @@ services:
   web:
     build: .
     restart: unless-stopped
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     env_file:

@@ -21,6 +21,11 @@ COPY . /app/
 
 RUN mkdir -p /app/media /app/staticfiles
 
+COPY demo_images/product_images/ /app/media/product_images/
+
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py shell -c \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123') if not User.objects.filter(username='admin').exists() else None\" && python manage.py shell -c \"from products.models import Product; import subprocess; subprocess.run(['python', 'manage.py', 'load_products', '--json-file', 'products_data.json'], check=False) if Product.objects.count() == 0 else None\" && python manage.py runserver 0.0.0.0:8000"]
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

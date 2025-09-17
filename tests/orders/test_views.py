@@ -30,7 +30,8 @@ class TestOrderViews:
     def test_cart_remove_view_post(self, client, product):
         """Test cart remove view POST request."""
         session = client.session
-        session['cart'] = {str(product.id): {'quantity': 2, 'price': str(product.price)}}
+        session['cart'] = {
+            str(product.id): {'quantity': 2, 'price': str(product.price)}}
         session.save()
 
         response = client.post(reverse(
@@ -66,7 +67,8 @@ class TestOrderViews:
         client.force_login(user)
 
         session = client.session
-        session['cart'] = {str(product.id): {'quantity': 2, 'price': str(product.price)}}
+        session['cart'] = {
+            str(product.id): {'quantity': 2, 'price': str(product.price)}}
         session.save()
 
         form_data = {

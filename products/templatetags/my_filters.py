@@ -1,3 +1,4 @@
+from typing import Any
 from urllib.parse import urlencode
 
 from django import template
@@ -38,7 +39,7 @@ def modify_query(context: dict, **kwargs) -> str:
 
 
 @register.filter
-def get_item(dictionary: dict, key: str) -> any:
+def get_item(dictionary: dict, key: str) -> Any:
     """Get item from dictionary by key."""
     try:
         return dictionary.get(str(key))

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Any
 
 from django.conf import settings
 from django.contrib import messages
@@ -43,7 +44,7 @@ class UserLoginView(LoginView):
     template_name = 'users/login.html'
     form_class = EmailLoginForm
 
-    def get_initial(self) -> dict[str, any]:
+    def get_initial(self) -> dict[str, Any]:
         """Get initial form data with pre-filled email if available."""
         initial = super(UserLoginView, self).get_initial()
         email = self.request.session.get('register_email')
@@ -105,7 +106,7 @@ class AccountView(TemplateView):
     """Main account page with order history and profile tabs."""
     template_name = 'users/account.html'
 
-    def get_context_data(self, **kwargs) -> dict[str, any]:
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
         """Get context data for account page with orders and filters."""
         context = super().get_context_data(**kwargs)
         user = self.request.user
@@ -216,7 +217,7 @@ def forgot_password(request: HttpRequest) -> HttpResponse:
                                    username=user.username,
                                    user_id=user.id,
                                    valid_until=timezone.now() +
-                                               timedelta(hours=1))
+                                   timedelta(hours=1))
                     messages.success(
                         request,
                         settings.MESSAGES['password_reset_sent']

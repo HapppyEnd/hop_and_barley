@@ -25,6 +25,7 @@ class User(AbstractUser):
         upload_to='profile_image',
         null=True,
         blank=True,
+        default='profile_image/default.jpg',
         help_text="User's profile image"
     )
     city = models.CharField(

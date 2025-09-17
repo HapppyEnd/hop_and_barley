@@ -133,7 +133,7 @@ class Product(JournalizedModel, SlugMixin):
         """Return image URL or default image."""
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
-        return '/static/img/products/default.png'
+        return '/media/product_images/default.png'
 
     def user_can_review(self, user) -> bool:
         """Check if user can review this product."""

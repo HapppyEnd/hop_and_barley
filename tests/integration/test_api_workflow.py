@@ -99,7 +99,7 @@ class TestAPIWorkflow:
             '/api/orders/', data=order_data, format='json'
         )
         assert response.status_code == status.HTTP_201_CREATED
-        assert (response.data['shipping_address'] == 
+        assert (response.data['shipping_address'] ==
                 order_data['shipping_address'])
 
         order_id = response.data['id']

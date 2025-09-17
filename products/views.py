@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -50,7 +52,7 @@ class ProductListView(ListView):
             queryset = queryset.order_by('-created_at')
         return queryset
 
-    def get_context_data(self, **kwargs) -> dict[str, any]:
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
         """Get context data for product list page."""
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
@@ -73,7 +75,7 @@ class ProductDetailView(DetailView):
         return Product.objects.filter(is_active=True).select_related(
             'category')
 
-    def get_context_data(self, **kwargs) -> dict[str, any]:
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
         """Get context data for product detail page."""
 
         context = super().get_context_data(**kwargs)
@@ -112,7 +114,7 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     template_name = 'products/review_form.html'
 
     def __init__(self, **kwargs):
-        super().__init__(kwargs)
+        super().__init__(**kwargs)
         self.product = None
 
     def get_success_url(self):

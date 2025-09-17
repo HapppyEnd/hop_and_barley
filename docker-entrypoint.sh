@@ -17,8 +17,11 @@ python manage.py migrate
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
+echo "Creating admin user..."
+python manage.py create_admin
+
 echo "Loading product data..."
-python load_products_data.py
+python manage.py shell < load_products_data.py
 
 echo "Starting server..."
 exec "$@"

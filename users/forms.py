@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
@@ -67,7 +69,7 @@ class UserRegisterForm(UserCreationForm):
             raise forms.ValidationError('Email already registered')
         return email
 
-    def clean_phone(self) -> any:
+    def clean_phone(self) -> Any:
         """Validate phone number."""
         phone = self.cleaned_data.get('phone')
         return phone
@@ -120,7 +122,7 @@ class UserProfileForm(forms.ModelForm):
         """Ensure email cannot be changed."""
         return self.instance.email
 
-    def clean_phone(self) -> any:
+    def clean_phone(self) -> Any:
         """Validate phone number."""
         phone = self.cleaned_data.get('phone')
         return phone
@@ -174,7 +176,7 @@ class ResetPasswordForm(forms.Form):
         )
     )
 
-    def clean(self) -> dict[str, any]:
+    def clean(self) -> dict[str, Any]:
         """Validate password fields."""
         cleaned_data = super().clean()
         new_password1 = cleaned_data.get('new_password1')

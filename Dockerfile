@@ -23,9 +23,7 @@ RUN mkdir -p /app/media /app/staticfiles
 
 COPY demo_images/product_images/ /app/media/product_images/
 
-RUN chmod +x /app/entrypoint.sh
-
 EXPOSE 8000
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

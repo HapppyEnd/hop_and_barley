@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 from django.http import HttpRequest
 
@@ -18,7 +20,7 @@ class Cart:
         self.cart = cart
 
     @staticmethod
-    def _clean_cart_data(cart: dict[str, any]) -> None:
+    def _clean_cart_data(cart: dict[str, Any]) -> None:
         """Clean corrupted data in cart."""
         items_to_remove = []
         for product_id, item in cart.items():
@@ -39,7 +41,7 @@ class Cart:
         """Add product to cart or update its quantity."""
         if quantity <= 0:
             return
-            
+
         product_id = str(product.id)
         if product_id not in self.cart:
             try:
@@ -74,7 +76,7 @@ class Cart:
             del self.cart[product_id]
             self.save()
 
-    def __iter__(self) -> any:
+    def __iter__(self) -> Any:
         """Iterate over cart items with formatted data."""
         for product_id, item in self.cart.items():
             item_copy = item.copy()

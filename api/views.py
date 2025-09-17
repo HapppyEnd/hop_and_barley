@@ -432,7 +432,7 @@ class CartViewSet(viewsets.ViewSet):
         try:
             product = Product.objects.get(id=product_id)
             cart.add(product, quantity)
-            return self.list(request)  # Возвращаем обновлённую корзину
+            return self.list(request)
         except Product.DoesNotExist:
             return Response(
                 {'error': 'Product not found'},
@@ -447,7 +447,7 @@ class CartViewSet(viewsets.ViewSet):
         try:
             product = Product.objects.get(id=pk)
             cart.add(product, quantity, override_quantity=True)
-            return self.list(request)  # Возвращаем обновлённую корзину
+            return self.list(request)
         except Product.DoesNotExist:
             return Response(
                 {'error': 'Product not found'},
@@ -461,7 +461,7 @@ class CartViewSet(viewsets.ViewSet):
         try:
             product = Product.objects.get(id=pk)
             cart.remove(product)
-            return self.list(request)  # Возвращаем обновлённую корзину
+            return self.list(request)
         except Product.DoesNotExist:
             return Response(
                 {'error': 'Product not found'},
@@ -485,7 +485,7 @@ class CartViewSet(viewsets.ViewSet):
     def _prepare_cart_data(self, cart):
         """Prepare cart data for serialization."""
         items = []
-        for item in cart:  # Используем __iter__() метод
+        for item in cart:
             try:
                 product = Product.objects.get(id=item['product_id'])
                 item['product'] = product

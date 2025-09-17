@@ -1,6 +1,7 @@
 import random
 from datetime import datetime
 from decimal import Decimal
+from typing import Any, Callable
 
 from django.conf import settings
 from django.contrib import messages
@@ -22,7 +23,7 @@ def get_cart_response(
         success: bool = True,
         message: str = "",
         total_price: Decimal | None = None
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """Create consistent cart responses."""
     response_data = {
         'success': success,
@@ -38,7 +39,7 @@ def get_cart_response(
 
 def handle_cart_operation(
         request: HttpRequest,
-        operation_func: callable,
+        operation_func: Callable,
         success_message: str,
         error_message: str = "Invalid operation"
 ) -> JsonResponse | HttpResponse:

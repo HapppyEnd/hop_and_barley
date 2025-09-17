@@ -176,6 +176,10 @@ body {
     min-height: 100vh;
 }
 
+.page-wrapper main {
+    flex: 1;
+}
+
 *, *::before, *::after {
     box-sizing: inherit;
 }
@@ -972,16 +976,17 @@ main {
 
 footer {
     width: 100%;
-    padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md) var(--spacing-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
     background-color: var(--black-main);
     color: var(--white-text);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
     margin-top: auto;
     position: relative;
     z-index: 1;
+    flex-shrink: 0;
 }
 
 .footer__hops-logo {
@@ -1031,8 +1036,50 @@ footer {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: 40px 0;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Fix footer on auth pages */
+body:has(.auth-page-wrapper) footer {
+    padding: var(--spacing-sm) 0;
+    gap: var(--spacing-sm);
+}
+
+/* Remove extra margins and padding on auth pages */
+body:has(.auth-page-wrapper) {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body:has(.auth-page-wrapper) .page-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body:has(.auth-page-wrapper) header {
+    margin: 0;
+    padding: 0;
+}
+
+body:has(.auth-page-wrapper) main {
+    margin: 0;
+    padding: 0;
+}
+
+/* Remove excessive margins and padding on auth pages, but preserve necessary spacing */
+body:has(.auth-page-wrapper) .container {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Restore necessary padding for form container */
+body:has(.auth-page-wrapper) .auth-form-container {
+    padding: 0;
+    width: 100%;
+    max-width: 416px;
+    margin: 0 auto;
 }
 
 .auth-background {
@@ -1050,7 +1097,8 @@ footer {
 }
 
 .auth-container--register {
-    width: 416px;
+    width: 100%;
+    max-width: 416px;
     height: auto;
     padding: 24px;
     background: var(--background-default);
@@ -1060,6 +1108,7 @@ footer {
     flex-direction: column;
     align-items: center;
     gap: 24px;
+    box-sizing: border-box;
 }
 
 .auth-container--account-edit {
@@ -1218,7 +1267,7 @@ footer {
 .InputField textarea,
 .InputField select {
     width: 100%;
-    height: 40px;
+    /* height: 40px; */
     padding: var(--spacing-md) var(--spacing-lg);
     background-color: var(--background-grey);
     border: 1px solid var(--border-default);
@@ -1382,7 +1431,8 @@ footer {
 /* Common auth container styles */
 .auth-container--login,
 .auth-container--forgot-password {
-    width: 416px;
+    width: 100%;
+    max-width: 416px;
     padding: 24px;
     background: var(--background-default);
     border: 1px solid var(--border-default);
@@ -1391,6 +1441,7 @@ footer {
     flex-direction: column;
     align-items: center;
     gap: 24px;
+    box-sizing: border-box;
 }
 
 .auth-container--login .auth-form,
@@ -2840,42 +2891,6 @@ body.user-logged-in .header__user-actions {
     margin-bottom: 24px;
 }
 
-@media (max-width: 768px) {
-    .order-content {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .order-card-content {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .order-item-card {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .order-item-image {
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 16px;
-    }
-
-    .order-header h2 {
-        font-size: 24px;
-    }
-
-    .orders-page-title {
-        font-size: 24px;
-    }
-
-    .order-header-main {
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
-    }
-}
 
 .pagination-link-account {
     font-size: 16px;
@@ -3479,31 +3494,6 @@ body.user-logged-in .header__user-actions {
     font-size: 18px;
 }
 
-@media (max-width: 768px) {
-    .main-content-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .search-sort-bar {
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .search-input-wrapper {
-        max-width: 100%;
-    }
-
-    .product-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 16px;
-    }
-
-    .sort-options {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-}
 
 .card-payment-form {
     margin-top: 20px;
@@ -3717,32 +3707,6 @@ body.user-logged-in .header__user-actions {
     font-size: 12px;
 }
 
-@media (max-width: 768px) {
-    .card-form-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .card-form-grid .form-group:first-child {
-        grid-column: 1;
-    }
-
-    .payment-methods {
-        gap: 8px;
-    }
-
-    .payment-label {
-        padding: 12px 16px;
-    }
-
-    .payment-label > div {
-        gap: 8px;
-    }
-
-    .payment-label i {
-        font-size: 18px;
-    }
-}
 
 
 
@@ -3833,40 +3797,8 @@ body.user-logged-in .header__user-actions {
     color: #dc3545;
 }
 
-@media (max-width: 768px) {
-    .auth-container--account-edit {
-        width: 90vw;
-        max-width: 90vw;
-        padding: 16px;
-        gap: 12px;
-    }
 
-    .auth-container--account-edit .auth-form {
-        gap: 10px;
-    }
 
-    .auth-container--account-edit .ButtonGroup {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .auth-container--account-edit .ButtonGroup .button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .auth-container--account-edit {
-        width: 98vw;
-        max-width: 98vw;
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .auth-container--account-edit .auth-title {
-        font-size: 16px;
-    }
-}
 
 /* Account page styles */
 .account-info-display {

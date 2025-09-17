@@ -29,4 +29,4 @@ RUN sed -i 's/\r$//' /app/docker-entrypoint.sh && chmod +x /app/docker-entrypoin
 
 EXPOSE 8000
 
-CMD ["/bin/bash", "/app/docker-entrypoint.sh", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["/bin/bash", "/app/docker-entrypoint.sh", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]

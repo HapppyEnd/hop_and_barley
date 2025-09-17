@@ -33,7 +33,7 @@
 
 1. **Клонируйте репозиторий:**
 ```bash
-git clone <repository-url>
+git clone https://github.com/HapppyEnd/hop_and_barley
 cd hop_and_barley
 ```
 
@@ -41,7 +41,7 @@ cd hop_and_barley
 ```env
 # Django settings
 SECRET_KEY=django-insecure-tbp_34lbgl)8$08+mjppzp^yw5zb$#3$z9a)wlv6*a$y484a)c
-DEBUG=True
+DEBUG=False
 ALLOWED_HOSTS=localhost,127.0.0.1
 
 # Database settings
@@ -53,8 +53,6 @@ POSTGRES_PASSWORD=postgres
 # Docker
 DOCKER_CONTAINER=true
 
-# Email settings (for development)
-EMAIL_BACKEND=django.core.mail.backends.filebased.EmailBackend
 ```
 
 3. **Запустите проект:**

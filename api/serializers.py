@@ -167,14 +167,16 @@ class CartSerializer(serializers.Serializer):
     total_price = serializers.SerializerMethodField()
     items_count = serializers.SerializerMethodField()
 
-    def get_total_price(self, obj):
+    @extend_schema_field(serializers.CharField())
+    def get_total_price(self, obj) -> str:
         """Get total cart price from session cart."""
         cart = obj.get('cart_instance')
         if cart:
             return cart.get_total_price()
         return "$0.00"
 
-    def get_items_count(self, obj):
+    @extend_schema_field(serializers.IntegerField())
+    def get_items_count(self, obj) -> int:
         """Get total number of items in cart."""
         cart = obj.get('cart_instance')
         if cart:

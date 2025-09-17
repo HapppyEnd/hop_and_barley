@@ -384,38 +384,16 @@ class UserRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema_view(
-    list=extend_schema(
-        summary="Get Cart",
-        description="Get current session cart contents",
-        tags=["Cart"]
-    ),
-    create=extend_schema(
-        summary="Add Item To Cart",
-        description="Add product to cart with quantity",
-        tags=["Cart"]
-    ),
-    update=extend_schema(
-        summary="Update Cart Item",
-        description="Update cart item quantity",
-        tags=["Cart"]
-    ),
-    partial_update=extend_schema(
-        summary="Partial Update Cart Item",
-        description="Partially update cart item",
-        tags=["Cart"]
-    ),
-    destroy=extend_schema(
-        summary="Remove Cart Item",
-        description="Remove item from cart",
-        tags=["Cart"]
-    ),
-)
 class CartViewSet(viewsets.ViewSet):
     """ViewSet for managing session-based shopping cart."""
 
     serializer_class = CartSerializer
 
+    @extend_schema(
+        summary="Get Cart",
+        description="Get current session cart contents",
+        tags=["Cart"]
+    )
     def list(self, request):
         """Get cart contents."""
         cart = SessionCart(request)
@@ -423,6 +401,11 @@ class CartViewSet(viewsets.ViewSet):
         serializer = self.serializer_class(cart_data)
         return Response(serializer.data)
 
+    @extend_schema(
+        summary="Add Item To Cart",
+        description="Add product to cart with quantity",
+        tags=["Cart"]
+    )
     def create(self, request):
         """Add item to cart."""
         cart = SessionCart(request)
@@ -439,7 +422,21 @@ class CartViewSet(viewsets.ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    def update(self, request, pk=None):
+    @extend_schema(
+        summary="Update Cart Item",
+        description="Update cart item quantity",
+        tags=["Cart"],
+        parameters=[
+            {
+                'name': 'id',
+                'in': 'path',
+                'description': 'Product ID',
+                'required': True,
+                'schema': {'type': 'integer'}
+            }
+        ]
+    )
+    def update(self, request, pk: int = None):
         """Update cart item quantity."""
         cart = SessionCart(request)
         quantity = request.data.get('quantity', 1)
@@ -454,7 +451,21 @@ class CartViewSet(viewsets.ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    def destroy(self, request, pk=None):
+    @extend_schema(
+        summary="Remove Cart Item",
+        description="Remove item from cart",
+        tags=["Cart"],
+        parameters=[
+            {
+                'name': 'id',
+                'in': 'path',
+                'description': 'Product ID',
+                'required': True,
+                'schema': {'type': 'integer'}
+            }
+        ]
+    )
+    def destroy(self, request, pk: int = None):
         """Remove item from cart."""
         cart = SessionCart(request)
 

@@ -21,7 +21,7 @@ echo "Creating admin user..."
 python manage.py create_admin
 
 echo "Loading product data..."
-python manage.py shell < load_products_data.py
+python manage.py load_products --clear
 
 echo "Starting server..."
 exec "$@"

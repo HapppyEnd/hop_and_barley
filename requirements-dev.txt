@@ -1,0 +1,16 @@
+# Development dependencies
+-r requirements.txt
+
+# Testing
+coverage==7.10.6
+factory_boy==3.3.1
+Faker==33.1.0
+pytest==8.3.4
+pytest-cov==6.0.0
+pytest-django==4.9.0
+
+# Linting and code quality
+flake8==7.3.0
+
+# Additional dev tools
+colorama==0.4.6

@@ -167,17 +167,19 @@ hop_and_barley/
 
 ### Запуск тестов (локально)
 ```bash
+# Убедитесь, что виртуальное окружение активировано и DOCKER_CONTAINER=false
+
 # Все тесты
-py -m pytest
+pytest
 
 # С покрытием
-py -m pytest --cov=.
+pytest --cov=.
 
 # Конкретный модуль
-py -m pytest tests/products/
+pytest tests/products/
 
 # Конкретный тест
-py -m pytest tests/products/test_models.py::TestProductModel::test_product_creation
+pytest tests/products/test_models.py::TestProductModel::test_product_creation
 ```
 
 ### 🚀 Локальная разработка
@@ -185,23 +187,31 @@ py -m pytest tests/products/test_models.py::TestProductModel::test_product_creat
 Для работы с проектом локально (без Docker):
 
 ```bash
+# Создание и активация виртуального окружения
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/Mac:
+# source .venv/bin/activate
+
 # Установка зависимостей
 pip install -r requirements.txt
 
 # Настройка переменных окружения
 # Создайте .env файл с DOCKER_CONTAINER=false
+# Это важно для корректной работы с SQLite
 
 # Применение миграций
-py manage.py migrate
+python manage.py migrate
 
 # Создание суперпользователя
-py manage.py createsuperuser
+python manage.py createsuperuser
 
 # Загрузка тестовых данных
-py manage.py load_products
+python manage.py load_products
 
 # Запуск сервера разработки
-py manage.py runserver
+python manage.py runserver
 ```
 
 ## 📊 Модели данных

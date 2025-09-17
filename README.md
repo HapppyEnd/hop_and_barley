@@ -40,17 +40,18 @@ cd hop_and_barley
 2. **Создайте файл окружения `.env` в корне проекта:**
 ```env
 # Django settings
-SECRET_KEY=your-secret-key-here
+SECRET_KEY=django-insecure-tbp_34lbgl)8$08+mjppzp^yw5zb$#3$z9a)wlv6*a$y484a)c
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 
 # Database settings
-POSTGRES_PASSWORD=postgres
 DATABASE_URL=postgresql://postgres:postgres@db:5432/hop_and_barley
+POSTGRES_DB=hop_and_barley
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
 
 # Docker
-DOCKER_CONTAINER=false  # для локального запуска с SQLite
-# DOCKER_CONTAINER=true  # для запуска в Docker с PostgreSQL
+DOCKER_CONTAINER=true
 
 # Email settings (for development)
 EMAIL_BACKEND=django.core.mail.backends.filebased.EmailBackend
@@ -91,9 +92,9 @@ docker-compose logs -f web
 ### 🔧 Переменные окружения
 
 **Важно:**
+- `DOCKER_CONTAINER=true` - использует PostgreSQL в Docker (рекомендуется)
 - `DOCKER_CONTAINER=false` - использует SQLite для локальной разработки
-- `DOCKER_CONTAINER=true` - использует PostgreSQL в Docker
-- Замените `your-secret-key-here` на реальный секретный ключ
+- Секретный ключ уже настроен для разработки
 - Email настройки уже настроены в `settings.py`
 - В dev режиме email сохраняются в папку `sent_emails/` как файлы
 
